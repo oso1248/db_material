@@ -1,0 +1,20 @@
+from .database import cursor, conn
+
+Create
+cursor.execute("""INSERT INTO posts (title, content, is_published) VALUES (%s, %s, %s) RETURNING *; """, (post.title, post.content, post.published))
+data = cursor.fetchone()
+conn.commit()
+
+Read
+cursor.execute("""SELECT * FROM posts ORDER BY id;""")
+data = cursor.fetchall()
+
+Update
+cursor.execute("""UPDATE posts SET title = %s, content = %s, is_published = %s WHERE id = %s RETURNING *; """, (post.title, post.content, post.is_published, str(id)))
+data = cursor.fetchone()
+conn.commit()
+
+Delete
+cursor.execute("""DELETE FROM posts WHERE id = %s RETURNING *; """, str(id))
+data = cursor.fetchone()
+conn.commit()
