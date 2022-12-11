@@ -1,7 +1,7 @@
+from .md import post_create, post_get_all, post_get_one, post_update, post_delete
 from fastapi import status, Depends, APIRouter, Response
 from ..oauth2.oauth2 import get_current_user
 from ..validators import val_posts, val_auth
-from .md import post_create, post_get_all
 from ..database.database import get_db
 from sqlalchemy.orm import Session
 from typing import List, Optional
@@ -55,7 +55,7 @@ def posts_get_all(db: Session = Depends(get_db), limit: int = 10, skip: int = 0,
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.get("/{id}", response_model=val_posts.PostGet)
+@router.get("/{id}", response_model=val_posts.PostGet, description=post_get_one)
 @logger.catch()
 def posts_get_one(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
@@ -75,7 +75,7 @@ def posts_get_one(id: int, db: Session = Depends(get_db), current_user: val_auth
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.put("/{id}", response_model=val_posts.PostReturn)
+@router.put("/{id}", response_model=val_posts.PostReturn, description=post_update)
 @logger.catch()
 def posts_update(post: val_posts.PostUpdate, id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
@@ -101,7 +101,7 @@ def posts_update(post: val_posts.PostUpdate, id: int, db: Session = Depends(get_
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT, description=post_delete)
 @logger.catch()
 def posts_delete(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 

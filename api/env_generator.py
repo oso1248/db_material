@@ -2,10 +2,15 @@ from passlib.context import CryptContext
 import string
 import random
 
+
+# Generates SQL To Insert Admin User In users From Enviroment Variable When Useing Alembic To Create Tables.
+# Path: ./alembic/versions/d6931db81268__users_00002.py Line: 40
+
+
 # Fill Out Enviroment Varibles
 # Edit below
 admin_password = ""
-DATABASE_HOST = ""
+DATABASE_HOST = "localhost"  # Host If Running PostgreSQL On Local Machine
 DATABASE_NAME = ""
 DATABASE_PORT = 5432  # Port For Postgres
 DATABASE_PASSWORD = ""
@@ -54,6 +59,7 @@ L = [
 file1 = open("../env.txt", "w+")
 file1.writelines(L)
 file1.close()
-# file1 = open("../envtest.txt", "r+")
-# print(file1.read())
-# file1.close()
+file1 = open("../env.txt", "r+")
+print("Generated In env File...\n")
+print(file1.read())
+file1.close()

@@ -48,4 +48,7 @@ def get_current_user(token: str = Depends(oauth2_schema), db: Session = Depends(
     token = verify_access_token(token, credentials_exception)
     user = db.query(mdl_users.Users).filter(mdl_users.Users.id == token.id).first()
 
+    if not user.is_active:
+        raise credentials_exception
+
     return user

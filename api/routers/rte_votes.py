@@ -5,12 +5,13 @@ from sqlalchemy.orm import Session
 from ..database.database import get_db
 from ..models import mdl_post
 from loguru import logger
+from .md import votes
 
 
 router = APIRouter(prefix="/votes", tags=['Votes'])
 
 
-@router.post("", status_code=status.HTTP_201_CREATED)
+@router.post("", status_code=status.HTTP_201_CREATED, description=votes)
 @logger.catch()
 def vote(vote: val_votes.VoteBase, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
