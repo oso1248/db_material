@@ -8,7 +8,7 @@ class UsersBase(BaseModel):
     name_first: Name
     name_last: Name
     is_active: bool = True
-    permissions: conint(ge=0, le=7) = 1
+    permissions: conint(ge=0, le=7)
 
 
 class UserInclude(BaseModel):
@@ -20,6 +20,7 @@ class UserInclude(BaseModel):
 
 
 class UsersCreate(UsersBase):
+    permissions: conint(ge=0, le=6) = 1
     password: Password
 
 
