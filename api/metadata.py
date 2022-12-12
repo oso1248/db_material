@@ -4,10 +4,10 @@ description = f"""\
 
 
 tags_metadata = [
-    {"name": "Auth", "description": "Authentication Endpoints", "externalDocs": {"description": "¿Would You Like To Know More?", "url": "https://www.google.com"}},
-    {"name": "Users", "description": "Users Endpoints", "externalDocs": {"description": "¿Would You Like To Know More?", "url": "https://www.google.com"}},
-    {"name": "Posts", "description": "Posts Endpoints", "externalDocs": {"description": "¿Would You Like To Know More?", "url": "https://www.google.com"}},
-    {"name": "Votes", "description": "Votes Endpoints", "externalDocs": {"description": "¿Would You Like To Know More?", "url": "https://www.google.com"}},
+    {"name": "Auth", "description": "Authentication Endpoints", "externalDocs": {"description": "¿Would You Like To Know More?", "url": "https://github.com/oso1248/baseAPI/blob/master/api/routers/README/AUTH.md"}},
+    {"name": "Users", "description": "Users Endpoints", "externalDocs": {"description": "¿Would You Like To Know More?", "url": "https://github.com/oso1248/baseAPI/blob/master/api/routers/README/USERS.md"}},
+    {"name": "Posts", "description": "Posts Endpoints", "externalDocs": {"description": "¿Would You Like To Know More?", "url": "https://github.com/oso1248/baseAPI/blob/master/api/routers/README/POSTS.md"}},
+    {"name": "Votes", "description": "Votes Endpoints", "externalDocs": {"description": "¿Would You Like To Know More?", "url": "https://github.com/oso1248/baseAPI/blob/master/api/routers/README/VOTES.md"}},
 ]
 
 
