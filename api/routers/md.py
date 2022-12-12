@@ -27,6 +27,7 @@ user_create = """
 | 401              | Unauthorized     | Not Logged In                                   |
 | 403              | Forbidden        | Insufficient Permissions                        |
 | 404              | Not Found        | Insert Produced No Results                      |
+| 409              | Confiict         | User EID Already Exists                         |
 | 422              | Validation Error | Invalid/Missing Parameters Description          |
 """
 

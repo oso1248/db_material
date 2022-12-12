@@ -21,6 +21,11 @@ def users_create(user: val_users.UsersCreate, db: Session = Depends(get_db), cur
         return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
+        is_user = db.query(mdl_users.Users).filter(mdl_users.Users.eid == user.eid).first()
+        
+        if is_user:
+            return Response(status_code=status.HTTP_409_CONFLICT)
+
         user.password = utils.hash_password(user.password)
         data = mdl_users.Users(created_by=current_user.id, updated_by=current_user.id, **user.dict())
         db.add(data)
