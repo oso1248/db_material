@@ -41,7 +41,7 @@ if not SECRET_KEY:
 
 
 hashed_password = hash_password(admin_password)
-USER_INSERT = f"INSERT INTO users (name, username, role, password, created_by, updated_by, brewery, permissions) VALUES ('Admin', 'admin', 'Admin', '{hashed_password}', 1, 1, 'FTC', 7);"
+USER_INSERT=f"INSERT INTO users (eid, name_first, name_last, is_active, permissions, password, created_by, updated_by) VALUES ('aa00000', 'Admin', 'Admin', True, 7, '{hashed_password}', 1, 1);"
 L = [
     f"SQLALCHEMY_DATABASE_URL=postgresql://{DATABASE_USERNAME}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}\n",
     f"DATABASE_HOST={DATABASE_HOST}\n",
