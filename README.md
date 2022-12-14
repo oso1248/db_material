@@ -23,17 +23,12 @@
 7. Change File Name:
     -   ```env.txt``` to ```.env```
 
-8. Terminal Command: Exit Virtual Enviroment
-    -   ```deactivate```
-
-9. Terminal Command: Create Database Tables
+8. Terminal Command: Create Database Tables
     -   ```alembic upgrade head```
 
-10. Terminal Command: Enter Virtual Enviroment
-    -   ```source venv/bin/activate```
-
-11. Terminal Command: Start Local Server
+9. Terminal Command: Start Local Server
     -   ```uvicorn api.main:app --reload```
 
-12. Open In Browser:
+10. Open In Browser:
     -   http://127.0.0.1:8000/docs
+    
