@@ -6,7 +6,12 @@ from api.config import settings
 
 from alembic import context
 from api.models import mdl_users
-from api.models import mdl_post
+from api.models import mdl_brands
+from api.models import mdl_suppliers
+from api.models import mdl_commodity
+from api.models import mdl_inventory
+from api.models import mdl_bridges_brewing
+
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

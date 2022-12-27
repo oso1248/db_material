@@ -1,6 +1,6 @@
 from .classes.cls_users import Eid, Name, Password
 from pydantic import BaseModel, conint
-from datetime import datetime
+from datetime import datetime, date
 
 
 class UsersBase(BaseModel):
@@ -26,7 +26,8 @@ class UsersCreate(UsersBase):
 
 class UsersGet(UsersBase):
     id: int
-    time_created: datetime
+    time_created: date
+    time_updated: date
     creator: UserInclude
     updater: UserInclude
 

@@ -1,5 +1,5 @@
 from .metadata import description, tags_metadata, title_metadata, version_metadata, terms_metadata, contact_metadata, licence_metadata, ui_metadata
-from .routers import rte_auth, rte_posts, rte_users, rte_votes
+from .routers import rte_auth, rte_users, rte_brands, rte_suppliers, rte_commodity, rte_inventory, rte_bridges_brewing
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 from loguru import logger
@@ -7,13 +7,13 @@ import logging
 import sys
 
 
-uvicorn_error = logging.getLogger("uvicorn.error")
-uvicorn_error.disabled = True
-uvicorn_access = logging.getLogger("uvicorn.access")
-uvicorn_access.disabled = False
+# uvicorn_error = logging.getLogger("uvicorn.error")
+# uvicorn_error.disabled = True
+# uvicorn_access = logging.getLogger("uvicorn.access")
+# uvicorn_access.disabled = False
 
-
-logger.add("logs/main.log", rotation="2 weeks", backtrace=False, diagnose=True)
+logger.remove()
+logger.add("logs/main.log", rotation="2 weeks", backtrace=False, diagnose=True, level="INFO", enqueue=True, delay=True)
 logger.add(sys.stderr, diagnose=False, backtrace=False)
 
 
@@ -42,7 +42,11 @@ app.add_middleware(
 async def root():
     return {"detail": "root"}
 
+
 app.include_router(rte_auth.router)
 app.include_router(rte_users.router)
-app.include_router(rte_posts.router)
-app.include_router(rte_votes.router)
+app.include_router(rte_brands.router)
+app.include_router(rte_suppliers.router)
+app.include_router(rte_commodity.router)
+app.include_router(rte_inventory.router)
+app.include_router(rte_bridges_brewing.router)

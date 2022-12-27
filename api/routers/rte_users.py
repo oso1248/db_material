@@ -1,4 +1,4 @@
-from .md import user_create, user_get_all, user_get_one, user_update, user_delete
+from .metadata import md_users
 from fastapi import status, Depends, APIRouter, Response
 from ..validators import val_users, val_auth
 from ..oauth2.oauth2 import get_current_user
@@ -13,7 +13,7 @@ from typing import List
 router = APIRouter(prefix="/users", tags=['Users'])
 
 
-@router.post("", status_code=status.HTTP_201_CREATED, response_model=val_users.UsersGet, description=user_create)
+@router.post("", status_code=status.HTTP_201_CREATED, response_model=val_users.UsersGet, description=md_users.user_create)
 @logger.catch()
 def users_create(user: val_users.UsersCreate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
@@ -42,7 +42,7 @@ def users_create(user: val_users.UsersCreate, db: Session = Depends(get_db), cur
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.get("", response_model=List[val_users.UsersGet], description=user_get_all)
+@router.get("", response_model=List[val_users.UsersGet], description=md_users.user_get_all)
 @logger.catch()
 def users_get_all(db: Session = Depends(get_db), active: bool = True, current_user: val_auth.UserCurrent = Depends(get_current_user)):
     
@@ -62,7 +62,7 @@ def users_get_all(db: Session = Depends(get_db), active: bool = True, current_us
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.get("/{id}", response_model=val_users.UsersGet, description=user_get_one)
+@router.get("/{id}", response_model=val_users.UsersGet, description=md_users.user_get_one)
 @logger.catch()
 def users_get_one(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
@@ -84,14 +84,14 @@ def users_get_one(id: int, db: Session = Depends(get_db), current_user: val_auth
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.put("/{id}", response_model=val_users.UsersGet, description=user_update)
+@router.put("/{id}", response_model=val_users.UsersGet, description=md_users.user_update)
 @logger.catch()
 def users_update(post: val_users.UsersUpdate, id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 6:
         return Response(status_code=status.HTTP_403_FORBIDDEN)
     if id == 1:
-        return Response(status_code=status.HTTP_403_FORBIDDEN)
+            return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         query = db.query(mdl_users.Users).filter(mdl_users.Users.id == id)
@@ -115,7 +115,7 @@ def users_update(post: val_users.UsersUpdate, id: int, db: Session = Depends(get
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT, description=user_delete)
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT, description=md_users.user_delete)
 @logger.catch()
 def users_delete(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 

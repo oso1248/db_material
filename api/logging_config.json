@@ -1,7 +1,7 @@
 {
     "logger": {
-        "path": "../logs",
-        "filename": "out.txt",
+        "path": "var/logs",
+        "filename": "out.log",
         "level": "info",
         "rotation": "20 days",
         "retention": "1 months",

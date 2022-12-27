@@ -8,13 +8,13 @@ from .. models import mdl_users
 from .. oauth2 import oauth2
 from .. utils import utils
 from loguru import logger
-from .md import user_login
+from .metadata import md_users
 
 
 router = APIRouter(prefix="/login", tags=['Auth'])
 
 
-@router.post('', response_model=val_auth.Token, description=user_login)
+@router.post('', response_model=val_auth.Token, description=md_users.user_login)
 @logger.catch()
 def login(user_credentials: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
 
