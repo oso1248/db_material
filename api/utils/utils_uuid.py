@@ -1,4 +1,5 @@
-from ..models.mdl_inventory import InventoryUUID
+from ..models.mdl_inventory import InventoryUUID, InventoryLastBrews, InventoryHop, InventoryMaterial
+from pydantic.types import UUID4
 import pendulum as ptime
 
 
@@ -31,4 +32,43 @@ def get_uuid(id: int, db):
     except Exception as error:
         db.flush()
         db.rollback()
+        return error
+
+
+def check_last_brews(uuid: UUID4, db):
+    try:
+        data = db.query(InventoryLastBrews).filter(InventoryLastBrews.uuid == uuid).first()
+
+        if data:
+            return True
+        else:
+            return False
+
+    except Exception as error:
+        return error
+
+
+def check_hop_inventory(uuid: UUID4, db):
+    try:
+        data = db.query(InventoryHop).filter(InventoryHop.uuid == uuid).first()
+
+        if data:
+            return True
+        else:
+            return False
+
+    except Exception as error:
+        return error
+
+
+def check_material_inventory(uuid: UUID4, db):
+    try:
+        data = db.query(InventoryMaterial).filter(InventoryMaterial.uuid == uuid).first()
+
+        if data:
+            return True
+        else:
+            return False
+
+    except Exception as error:
         return error
