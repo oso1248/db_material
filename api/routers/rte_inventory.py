@@ -1,13 +1,12 @@
+from ..utils.utils_uuid import get_uuid, check_last_brews, check_hop_inventory, check_material_inventory
 from fastapi import status, Depends, APIRouter, Response, Query
+from ..models import mdl_commodity, mdl_inventory
 from ..validators import val_auth, val_inventory
 from ..oauth2.oauth2 import get_current_user
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
-from ..utils.utils_uuid import get_uuid
 from ..database.database import get_db
 from sqlalchemy.orm import Session
-from ..models import mdl_commodity
-from ..models import mdl_inventory
 from .metadata import md_inventory
 from pydantic.types import UUID4
 from sqlalchemy import insert
@@ -55,6 +54,10 @@ def inventory_material_create(commodity: List[val_inventory.InvMaterialCreate], 
 
     try:
         current_uuid = get_uuid(current_user.id, db)
+        is_inventory = check_material_inventory(current_uuid, db)
+
+        if is_inventory:
+            return JSONResponse(status_code=status.HTTP_409_CONFLICT, content={'detail': "inventory already exists. delete privious inventory first"})
 
         item_list = []
         for item in commodity:
@@ -189,6 +192,34 @@ def inventory_material_update(id: int, commodity: val_inventory.InvMaterialUpdat
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@router.delete("/material/delete", status_code=status.HTTP_204_NO_CONTENT, description=md_inventory.inv_material_delete_all, tags=['Inventory Material'])
+@logger.catch()
+def inventory_material_delete_all(uuid: val_inventory.InvRetrieve, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
+
+    if current_user.permissions < 5:
+        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+
+    try:
+        data = db.query(mdl_inventory.InventoryMaterial).filter(mdl_inventory.InventoryMaterial.uuid == uuid.uuid)
+        does_exist = data.first()
+
+        if not does_exist:
+            return Response(status_code=status.HTTP_404_NOT_FOUND)
+
+        data.delete(synchronize_session=False)
+        db.commit()
+
+        return
+
+    except SQLAlchemyError as error:
+        error = re.sub('[\n"\s+]', " ", ''.join(error.orig.args))
+        return JSONResponse(status_code=status.HTTP_409_CONFLICT, content={'detail': error})
+
+    except Exception as error:
+        logger.error(f'{error}')
+        return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 @router.delete("/material/delete/{id}", status_code=status.HTTP_204_NO_CONTENT, description=md_inventory.inv_material_delete, tags=['Inventory Material'])
 @logger.catch()
 def inventory_material_delete(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
@@ -217,34 +248,6 @@ def inventory_material_delete(id: int, db: Session = Depends(get_db), current_us
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.delete("/material/delete/all/{uuid}", status_code=status.HTTP_204_NO_CONTENT, description=md_inventory.inv_material_delete_all, tags=['Inventory Material'])
-@logger.catch()
-def inventory_material_delete_all(uuid: UUID4, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
-
-    if current_user.permissions < 5:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
-
-    try:
-        data = db.query(mdl_inventory.InventoryMaterial).filter(mdl_inventory.InventoryMaterial.uuid == uuid)
-        does_exist = data.first()
-
-        if not does_exist:
-            return Response(status_code=status.HTTP_404_NOT_FOUND)
-
-        data.delete(synchronize_session=False)
-        db.commit()
-
-        return
-
-    except SQLAlchemyError as error:
-        error = re.sub('[\n"\s+]', " ", ''.join(error.orig.args))
-        return JSONResponse(status_code=status.HTTP_409_CONFLICT, content={'detail': error})
-
-    except Exception as error:
-        logger.error(f'{error}')
-        return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
 ### Hop Inventory ###
 @router.post("/hop", status_code=status.HTTP_201_CREATED, description=md_inventory.inv_hop_create, tags=['Inventory Hop'])
 @logger.catch()
@@ -254,7 +257,14 @@ def inventory_hop_create(commodity: List[val_inventory.InvHopCreate], db: Sessio
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
 
     try:
-        current_uuid = get_uuid(current_user.id, db)
+        current_uuid: UUID4 = get_uuid(current_user.id, db)
+        is_last_brews = check_last_brews(current_uuid, db)
+        is_inventory = check_hop_inventory(current_uuid, db)
+        
+        if not is_last_brews:
+            return JSONResponse(status_code=status.HTTP_409_CONFLICT, content={'detail': "must add last brews first"})
+        elif is_inventory:
+            return JSONResponse(status_code=status.HTTP_409_CONFLICT, content={'detail': "inventory already exists. delete privious inventory first"})
 
         item_list = []
         for item in commodity:
@@ -290,6 +300,11 @@ def inventory_hop_add(uuid: UUID4, commodity: val_inventory.InvHopCreate, db: Se
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
 
     try:
+        is_last_brews = check_last_brews(uuid, db)
+
+        if not is_last_brews:
+            return JSONResponse(status_code=status.HTTP_409_CONFLICT, content={'detail': "must add last brews first"})
+
         data = mdl_inventory.InventoryHop(created_by=current_user.id, updated_by=current_user.id, uuid=uuid, **commodity.dict())
         db.add(data)
         db.commit()
@@ -389,15 +404,15 @@ def inventory_hop_update(id: int, commodity: val_inventory.InvHopUpdate, db: Ses
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.delete("/hop/delete/{id}", status_code=status.HTTP_204_NO_CONTENT, description=md_inventory.inv_hop_delete, tags=['Inventory Hop'])
+@router.delete("/hop/delete", status_code=status.HTTP_204_NO_CONTENT, description=md_inventory.inv_hop_delete_all, tags=['Inventory Hop'])
 @logger.catch()
-def inventory_hop_delete(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
+def inventory_hop_delete_all(uuid: val_inventory.InvRetrieve, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 5:
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
 
     try:
-        data = db.query(mdl_inventory.InventoryHop).filter(mdl_inventory.InventoryHop.id == id)
+        data = db.query(mdl_inventory.InventoryLastBrews).filter(mdl_inventory.InventoryLastBrews.uuid == uuid.uuid)
         does_exist = data.first()
 
         if not does_exist:
@@ -417,15 +432,15 @@ def inventory_hop_delete(id: int, db: Session = Depends(get_db), current_user: v
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.delete("/hop/delete/all/{uuid}", status_code=status.HTTP_204_NO_CONTENT, description=md_inventory.inv_hop_delete_all, tags=['Inventory Hop'])
+@router.delete("/hop/delete/{id}", status_code=status.HTTP_204_NO_CONTENT, description=md_inventory.inv_hop_delete, tags=['Inventory Hop'])
 @logger.catch()
-def inventory_hop_delete_all(uuid: UUID4, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
+def inventory_hop_delete(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 5:
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
 
     try:
-        data = db.query(mdl_inventory.InventoryHop).filter(mdl_inventory.InventoryHop.uuid == uuid)
+        data = db.query(mdl_inventory.InventoryHop).filter(mdl_inventory.InventoryHop.id == id)
         does_exist = data.first()
 
         if not does_exist:
@@ -455,6 +470,10 @@ def inventory_last_brews_create(brews: val_inventory.InvLastBrewsCreate, db: Ses
 
     try:
         current_uuid = get_uuid(current_user.id, db)
+        is_last_brews = check_last_brews(current_uuid, db)
+
+        if is_last_brews:
+            return JSONResponse(status_code=status.HTTP_409_CONFLICT, content={'detail': "inventory already exists. delete privious inventory first"})
 
         data = mdl_inventory.InventoryLastBrews(created_by=current_user.id, updated_by=current_user.id, uuid=current_uuid, **brews.dict())
         db.add(data)
