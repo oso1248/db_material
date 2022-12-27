@@ -93,6 +93,7 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['id_commodity'], ['commodity.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['updated_by'], ['users.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['uuid'], ['inventory_uuid.uuid'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['uuid'], ['inventory_last_brews.uuid'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('inventory_material',
