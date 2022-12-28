@@ -54,7 +54,7 @@ def upgrade():
     op.create_table('bridge_jobs_brewing',
     sa.Column('id_user', sa.Integer(), nullable=False),
     sa.Column('id_jobs_brewing', sa.Integer(), nullable=False),
-    sa.Column('skap', sa.String(length=8), nullable=False),
+    sa.Column('skap', sa.Integer(), nullable=False),
     sa.Column('note', sa.String(length=256), nullable=True),
     sa.Column('created_by', sa.Integer(), nullable=False),
     sa.Column('updated_by', sa.Integer(), nullable=False),
@@ -90,9 +90,29 @@ def upgrade():
     FOR EACH ROW
     EXECUTE PROCEDURE update_timestamp();
     """)
+    session.execute("""
+    CREATE OR REPLACE FUNCTION delete_empty_rows_bridge_jobs_brewing() RETURNS TRIGGER
+    LANGUAGE plpgsql
+    AS
+    $$
+    BEGIN
+    DELETE FROM bridge_jobs_brewing WHERE skap = 0;
+    RETURN NULL;
+    END;
+    $$;
+    """)
+    session.execute("""
+    CREATE TRIGGER trigger_delete_empty_rows_bridge_jobs_brewing
+    AFTER INSERT ON bridge_jobs_brewing
+    EXECUTE PROCEDURE delete_empty_rows_bridge_jobs_brewing();
+    """)
 
 
 def downgrade():
     op.drop_table('bridge_jobs_brewing')
     op.drop_table('jobs_brewing')
     op.drop_table('users')
+
+    bind = op.get_bind()
+    session = Session(bind=bind)
+    session.execute("DROP FUNCTION delete_empty_rows_bridge_jobs_brewing();")

@@ -40,8 +40,8 @@ class Name(str):
     @classmethod
     def __modify_schema__(cls, field_schema):
         field_schema.update(
-            pattern='^[a-zA-Z0-9\x20]{5,50}$',
-            examples='Must Be: Alphanumeric characters, 5-50 characters in length',
+            pattern='^[a-zA-Z0-9\x20]{3,50}$',
+            examples='Must Be: Alphanumeric characters, 3-50 characters in length',
         )
 
     @classmethod
@@ -50,7 +50,7 @@ class Name(str):
             raise TypeError('string required')
         m = regex_users_name.fullmatch(v)
         if not m:
-            raise ValueError('Must Be: Alphanumeric characters, 5-50 characters in length')
+            raise ValueError('Must Be: Alphanumeric characters, 3-50 characters in length')
 
         m = titlecase(cls(f'{m.group()}'))
 

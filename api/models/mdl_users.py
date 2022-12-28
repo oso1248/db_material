@@ -21,6 +21,11 @@ class Users(Base):
 
     creator = relationship('Users', foreign_keys=[created_by], remote_side=[id])
     updater = relationship('Users', foreign_keys=[updated_by], remote_side=[id])
+    jobs = relationship("JobsBrewing", secondary="bridge_jobs_brewing",
+                        primaryjoin="Users.id == BridgeJobsBrewing.id_user",
+                        secondaryjoin="BridgeJobsBrewing.id_jobs_brewing == JobsBrewing.id",
+                        backref='jobs_brewing',
+                        viewonly=True)
 
 
 class JobsBrewing(Base):
@@ -39,6 +44,11 @@ class JobsBrewing(Base):
 
     creator = relationship("Users", foreign_keys=[created_by])
     updater = relationship("Users", foreign_keys=[updated_by])
+    brewers = relationship("Users", secondary="bridge_jobs_brewing",
+                        primaryjoin="JobsBrewing.id == BridgeJobsBrewing.id_jobs_brewing",
+                        secondaryjoin="BridgeJobsBrewing.id_user == Users.id",
+                        backref='users',
+                        viewonly=True)
 
 
 class BridgeJobsBrewing(Base):
@@ -47,7 +57,7 @@ class BridgeJobsBrewing(Base):
     id_user = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), primary_key=True, nullable=False)
     id_jobs_brewing = Column(Integer, ForeignKey('jobs_brewing.id', ondelete='CASCADE'), primary_key=True, nullable=False)
     skap = Column(String(8), nullable=False)
-    note = Column(String(256), nullable=True)
+    note = Column(Integer, nullable=True)
     created_by = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     updated_by = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     time_created = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
@@ -55,3 +65,5 @@ class BridgeJobsBrewing(Base):
 
     creator = relationship("Users", foreign_keys=[created_by])
     updater = relationship("Users", foreign_keys=[updated_by])
+    brewer = relationship("Users", foreign_keys=[id_user])
+    job = relationship("JobsBrewing", foreign_keys=[id_jobs_brewing])
