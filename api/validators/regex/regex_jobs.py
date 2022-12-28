@@ -5,3 +5,6 @@ regex_jobs_jobname = re.compile(r'^[a-zA-Z0-9\x20]{5,50}$')
 
 # Limits to
 regex_jobs_jobarea = re.compile(r'\b(Brewhouse|Finishing)\b')
+
+# Limits to
+regex_jobs_skap = re.compile(r'^[0-5R]{1,1}$')

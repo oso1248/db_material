@@ -1,7 +1,7 @@
 import re
 
 # Limits to  Alphanumeric characters, 5-50 characters in length, no spaces
-regex_users_name = re.compile(r'^[a-zA-Z0-9]{5,50}$')
+regex_users_name = re.compile(r'^[a-zA-Z0-9]{3,50}$')
 
 
 # Limits to  Alphanumeric characters, 5-8 characters in length, no spaces

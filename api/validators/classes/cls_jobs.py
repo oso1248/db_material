@@ -1,5 +1,5 @@
-from ..regex.regex_jobs import regex_jobs_jobname, regex_jobs_jobarea
-from ...utils.utils import titlecase
+from ..regex.regex_jobs import regex_jobs_jobname, regex_jobs_jobarea, regex_jobs_skap
+from ...utils.utils import titlecase, uppercase, strip_non_alphanumeric
 
 
 class JobName(str):
@@ -58,3 +58,32 @@ class JobArea(str):
 
     def __repr__(self):
         return f'JobArea({super().__repr__()})'
+
+
+class Skap(str):
+
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def __modify_schema__(cls, field_schema):
+        field_schema.update(
+            pattern='\b(Brewhouse|Finishing)\b',
+            examples='Must Be: 1,2,3,4,5,R',
+        )
+
+    @classmethod
+    def validate(cls, v):
+        if not isinstance(v, str):
+            raise TypeError('string required')
+        m = regex_jobs_skap.fullmatch(v)
+        if not m:
+            raise ValueError('Must Be: 1,2,3,4,5,R')
+
+        m = titlecase(cls(f'{m.group()}'))
+
+        return m
+
+    def __repr__(self):
+        return f'Skap({super().__repr__()})'

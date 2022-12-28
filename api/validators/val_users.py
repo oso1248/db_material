@@ -1,6 +1,18 @@
 from .classes.cls_users import Eid, Name, Password
 from pydantic import BaseModel, conint
-from datetime import datetime, date
+from datetime import date
+from .classes.cls_jobs import JobName, JobArea
+from .classes.cls_universial import Note
+from typing import Optional, List
+
+
+class Jobs(BaseModel):
+    name_job: JobName
+    name_area: JobArea
+    note: Optional[Note]
+
+    class Config:
+        orm_mode = True
 
 
 class UsersBase(BaseModel):
@@ -30,6 +42,7 @@ class UsersGet(UsersBase):
     time_updated: date
     creator: UserInclude
     updater: UserInclude
+    jobs: List[Jobs]
 
     class Config:
         orm_mode = True

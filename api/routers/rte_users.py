@@ -50,7 +50,7 @@ def users_get_all(db: Session = Depends(get_db), active: bool = True, current_us
         return Response(status_code=status.HTTP_403_FORBIDDEN)
     
     try:
-        data = db.query(mdl_users.Users).filter(mdl_users.Users.is_active == active, mdl_users.Users.id != 1).all()
+        data = db.query(mdl_users.Users).filter(mdl_users.Users.is_active == active, mdl_users.Users.id != 1).order_by(mdl_users.Users.name_first.asc()).all()
 
         if not data:
             return Response(status_code=status.HTTP_404_NOT_FOUND)

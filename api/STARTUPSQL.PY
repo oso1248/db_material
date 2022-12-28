@@ -107,6 +107,30 @@ def RunIt() -> None:
     for item in data:
         print("Commodity -- ", item)
 
+    print("----------------------------------------------------------------------")
+    cursor.execute("""
+    INSERT INTO jobs_brewing (name_job, name_area, job_order, created_by, updated_by)
+    VALUES
+    ('Grains', 'Brewhouse', 1, 1, 1),
+    ('Brewhouse Panel', 'Brewhouse', 2, 1, 1),
+    ('Fermenting Panel', 'Brewhouse', 3, 1, 1),
+    ('Bh Sup 1', 'Brewhouse', 4, 1, 1),
+    ('Bh Sup 2', 'Brewhouse', 5, 1, 1),
+    ('Bh Sup 3', 'Brewhouse', 6, 1, 1),
+    ('Cellar Utility', 'Finishing', 7, 1, 1),
+    ('Schoene', 'Finishing', 8, 1, 1),
+    ('Filters', 'Finishing', 9, 1, 1),
+    ('Releasing', 'Finishing', 10, 1, 1),
+    ('Fin Sup 1', 'Finishing', 11, 1, 1),
+    ('Fin Sup 2', 'Finishing', 12, 1, 1),
+    ('Fin Sup 3', 'Finishing', 13, 1, 1)
+    RETURNING id, name_job;
+    """)
+    conn.commit()
+    data = cursor.fetchall()
+    for item in data:
+        print("Jobs -- ", item)
+
     conn.close()
     cursor.close()
 
