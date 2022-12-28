@@ -1,5 +1,5 @@
 from .metadata import description, tags_metadata, title_metadata, version_metadata, terms_metadata, contact_metadata, licence_metadata, ui_metadata
-from .routers import rte_auth, rte_users, rte_brands, rte_suppliers, rte_commodity, rte_inventory, rte_bridges_brewing
+from .routers import rte_auth, rte_users, rte_jobs, rte_brands, rte_suppliers, rte_commodity, rte_inventory, rte_bridges_brewing
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 from loguru import logger
@@ -45,6 +45,7 @@ async def root():
 
 app.include_router(rte_auth.router)
 app.include_router(rte_users.router)
+app.include_router(rte_jobs.router)
 app.include_router(rte_brands.router)
 app.include_router(rte_suppliers.router)
 app.include_router(rte_commodity.router)
