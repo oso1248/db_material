@@ -2,12 +2,15 @@ from .metadata import md_users
 from fastapi import status, Depends, APIRouter, Response
 from ..validators import val_users, val_auth
 from ..oauth2.oauth2 import get_current_user
+from sqlalchemy.exc import SQLAlchemyError
+from fastapi.responses import JSONResponse
 from ..database.database import get_db
 from sqlalchemy.orm import Session
 from ..models import mdl_users
 from ..utils import utils
 from loguru import logger
 from typing import List
+import re
 
 
 router = APIRouter(prefix="/users", tags=['Users'])
@@ -37,6 +40,10 @@ def users_create(user: val_users.UsersCreate, db: Session = Depends(get_db), cur
 
         return data
 
+    except SQLAlchemyError as error:
+        error = re.sub('[\n"\s+]', " ", ''.join(error.orig.args))
+        return JSONResponse(status_code=status.HTTP_409_CONFLICT, content={'detail': error})
+
     except Exception as error:
         logger.error(f'{error}')
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -56,6 +63,10 @@ def users_get_all(db: Session = Depends(get_db), active: bool = True, current_us
             return Response(status_code=status.HTTP_404_NOT_FOUND)
 
         return data
+
+    except SQLAlchemyError as error:
+        error = re.sub('[\n"\s+]', " ", ''.join(error.orig.args))
+        return JSONResponse(status_code=status.HTTP_409_CONFLICT, content={'detail': error})
 
     except Exception as error:
         logger.error(f'{error}')
@@ -78,6 +89,10 @@ def users_get_one(id: int, db: Session = Depends(get_db), current_user: val_auth
             return Response(status_code=status.HTTP_404_NOT_FOUND)
 
         return data
+
+    except SQLAlchemyError as error:
+        error = re.sub('[\n"\s+]', " ", ''.join(error.orig.args))
+        return JSONResponse(status_code=status.HTTP_409_CONFLICT, content={'detail': error})
 
     except Exception as error:
         logger.error(f'{error}')
@@ -110,6 +125,10 @@ def users_update(post: val_users.UsersUpdate, id: int, db: Session = Depends(get
 
         return data
 
+    except SQLAlchemyError as error:
+        error = re.sub('[\n"\s+]', " ", ''.join(error.orig.args))
+        return JSONResponse(status_code=status.HTTP_409_CONFLICT, content={'detail': error})
+
     except Exception as error:
         logger.error(f'{error}')
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -135,6 +154,10 @@ def users_delete(id: int, db: Session = Depends(get_db), current_user: val_auth.
         db.commit()
 
         return
+
+    except SQLAlchemyError as error:
+        error = re.sub('[\n"\s+]', " ", ''.join(error.orig.args))
+        return JSONResponse(status_code=status.HTTP_409_CONFLICT, content={'detail': error})
 
     except Exception as error:
         logger.error(f'{error}')

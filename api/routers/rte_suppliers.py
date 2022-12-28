@@ -37,7 +37,6 @@ def supplier_create(supplier: val_suppliers.SupplierCreate, db: Session = Depend
         return JSONResponse(status_code=status.HTTP_409_CONFLICT, content={'detail': error})
 
     except Exception as error:
-        print(error)
         logger.error(f'{error}')
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
