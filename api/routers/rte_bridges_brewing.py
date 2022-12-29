@@ -19,7 +19,7 @@ router = APIRouter(prefix="/bridgesbrewing")
 
 
 ### Brewing Additions ###
-@router.post("/addition", status_code=status.HTTP_202_ACCEPTED, description=md_bridges_brewing.add_update_delete, tags=['Brewing Addition'])
+@router.post("/addition", status_code=status.HTTP_202_ACCEPTED, description=md_bridges_brewing.addition_add_update_delete, tags=['Brewing Addition'])
 @logger.catch()
 def brewing_addition_add_update_delete(addition: List[val_bridges_brewing.BridgeAdditionCreate], db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
@@ -55,7 +55,7 @@ def brewing_addition_add_update_delete(addition: List[val_bridges_brewing.Bridge
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.get("/addition", response_model=List[val_bridges_brewing.BridgeDryHopGet], description=md_bridges_brewing.view_list, tags=['Brewing Addition'])
+@router.get("/addition", response_model=List[val_bridges_brewing.BridgeAdditionGet], description=md_bridges_brewing.addition_view_list, tags=['Brewing Addition'])
 @logger.catch()
 def brewing_addition_view_list(db: Session = Depends(get_db), brand: str = "", commodity: str = "", limit: int = 20, current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
@@ -84,7 +84,7 @@ def brewing_addition_view_list(db: Session = Depends(get_db), brand: str = "", c
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.get("/addition/{brand}", response_model=List[val_bridges_brewing.BridgeAdditionUpdateGet], description=md_bridges_brewing.update_list, tags=['Brewing Addition'])
+@router.get("/addition/{brand}", response_model=List[val_bridges_brewing.BridgeAdditionUpdateGet], description=md_bridges_brewing.addition_update_list, tags=['Brewing Addition'])
 @logger.catch()
 def brewing_addition_update_list(brand: str, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
@@ -116,7 +116,7 @@ def brewing_addition_update_list(brand: str, db: Session = Depends(get_db), curr
 
 
 ### Brewing Kettle Hop ###
-@router.post("/kettlehop", status_code=status.HTTP_202_ACCEPTED, description=md_bridges_brewing.add_update_delete, tags=['Brewing Kettle Hop'])
+@router.post("/kettlehop", status_code=status.HTTP_202_ACCEPTED, description=md_bridges_brewing.kettle_hop_add_update_delete, tags=['Brewing Kettle Hop'])
 @logger.catch()
 def brewing_kettle_hop_add_update_delete(addition: List[val_bridges_brewing.BridgeKettleHopCreate], db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
@@ -152,7 +152,7 @@ def brewing_kettle_hop_add_update_delete(addition: List[val_bridges_brewing.Brid
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.get("/kettlehop", response_model=List[val_bridges_brewing.BridgeKettleHopGet], description=md_bridges_brewing.view_list, tags=['Brewing Kettle Hop'])
+@router.get("/kettlehop", response_model=List[val_bridges_brewing.BridgeKettleHopGet], description=md_bridges_brewing.kettle_hop_view_list, tags=['Brewing Kettle Hop'])
 @logger.catch()
 def brewing_kettle_hop_view_list(db: Session = Depends(get_db), brand: str = "", commodity: str = "", limit: int = 20, current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
@@ -181,7 +181,7 @@ def brewing_kettle_hop_view_list(db: Session = Depends(get_db), brand: str = "",
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.get("/kettlehop/{brand}", response_model=List[val_bridges_brewing.BridgeKettleHopUpdateGet], description=md_bridges_brewing.update_list, tags=['Brewing Kettle Hop'])
+@router.get("/kettlehop/{brand}", response_model=List[val_bridges_brewing.BridgeKettleHopUpdateGet], description=md_bridges_brewing.kettle_hop_update_list, tags=['Brewing Kettle Hop'])
 @logger.catch()
 def brewing_addition_update_list(brand: str, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
@@ -213,7 +213,7 @@ def brewing_addition_update_list(brand: str, db: Session = Depends(get_db), curr
 
 
 ### Brewing Dry Hop ###
-@router.post("/dryhop", status_code=status.HTTP_202_ACCEPTED, description=md_bridges_brewing.add_update_delete, tags=['Brewing Dry Hop'])
+@router.post("/dryhop", status_code=status.HTTP_202_ACCEPTED, description=md_bridges_brewing.dry_hop_add_update_delete, tags=['Brewing Dry Hop'])
 @logger.catch()
 def brewing_dry_hop_add_update_delete(addition: List[val_bridges_brewing.BridgeDryHopCreate], db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
@@ -249,7 +249,7 @@ def brewing_dry_hop_add_update_delete(addition: List[val_bridges_brewing.BridgeD
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.get("/dryhop", response_model=List[val_bridges_brewing.BridgeDryHopGet], description=md_bridges_brewing.view_list, tags=['Brewing Dry Hop'])
+@router.get("/dryhop", response_model=List[val_bridges_brewing.BridgeDryHopGet], description=md_bridges_brewing.dry_hop_view_list, tags=['Brewing Dry Hop'])
 @logger.catch()
 def brewing_dry_hop_view_list(db: Session = Depends(get_db), brand: str = "", commodity: str = "", limit: int = 20, current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
@@ -278,7 +278,7 @@ def brewing_dry_hop_view_list(db: Session = Depends(get_db), brand: str = "", co
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.get("/dryhop/{brand}", response_model=List[val_bridges_brewing.BridgeDryHopUpdateGet], description=md_bridges_brewing.update_list, tags=['Brewing Dry Hop'])
+@router.get("/dryhop/{brand}", response_model=List[val_bridges_brewing.BridgeDryHopUpdateGet], description=md_bridges_brewing.dry_hop_update_list, tags=['Brewing Dry Hop'])
 @logger.catch()
 def brewing_dry_hop_update_list(brand: str, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 

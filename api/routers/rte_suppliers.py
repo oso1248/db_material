@@ -93,7 +93,7 @@ def supplier_get_one(id: int, db: Session = Depends(get_db), current_user: val_a
 @logger.catch()
 def supplier_update(supplier: val_suppliers.SupplierUpdate, id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
-    if current_user.permissions < 5:
+    if current_user.permissions < 4:
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
 
     try:

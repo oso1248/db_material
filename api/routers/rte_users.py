@@ -17,7 +17,7 @@ router = APIRouter(prefix="/users", tags=['Users'])
 @logger.catch()
 def users_create(user: val_users.UsersCreate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
-    if current_user.permissions < 6:
+    if current_user.permissions < 5:
         return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
@@ -88,7 +88,7 @@ def users_get_one(id: int, db: Session = Depends(get_db), current_user: val_auth
 @logger.catch()
 def users_update(post: val_users.UsersUpdate, id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
-    if current_user.permissions < 6:
+    if current_user.permissions < 5:
         return Response(status_code=status.HTTP_403_FORBIDDEN)
     if id == 1:
             return Response(status_code=status.HTTP_403_FORBIDDEN)
@@ -119,7 +119,7 @@ def users_update(post: val_users.UsersUpdate, id: int, db: Session = Depends(get
 @logger.catch()
 def users_delete(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
-    if current_user.permissions < 6:
+    if current_user.permissions < 7:
         return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:

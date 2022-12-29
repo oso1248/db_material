@@ -2,6 +2,7 @@ job_user_update = """
 ## ✅ Permissions Required: 5
 ## ✅ Consumes A LIST Objects
 ## ✅ Returns A LIST IDs Of Created Updated Or Deleted
+* **
 #### Injest Schema: UserJobsUpdate
 #### Return Schema: List
 **The below table defines the HTTP Status codes that this API may return**
@@ -19,23 +20,25 @@ job_user_update = """
 
 job_user_view_list = """
 ## ✅ Permissions Required: 5
+* **
 #### Injest Schema: Optional Path Search
 #### Return Schema: BridgeUserJobsGet
 **The below table defines the HTTP Status codes that this API may return**
 
-| Status Code      | Description          | Reason                                           |
-| ---------------- | ---------------------| -------------------------------------------------|
-| 200              | Job Retrieved        | Successful                                       |
-| 401              | Unauthorized         | Not Logged In                                    |
-| 403              | Forbidden            | Insufficient Permissions                         |
-| 404              | Not Found            | Search Parameters Produced No Results            |
-| 409              | Conflict             | Conflict With Database: Description Returned     |
-| 422              | Validation Error     | Invalid/Missing Parameters: Description Returned |
+| Status Code      | Description         | Reason                                           |
+| ---------------- | -----------------   | -------------------------------------------------|
+| 200              | Entry Retrieved     | Success                                          |
+| 401              | Unauthorized        | Not Logged In                                    |
+| 403              | Forbidden           | Insufficient Permissions                         |
+| 404              | Not Found           | Insert Produced No Results                       |
+| 409              | Conflict            | Conflict With Database: Description Returned     |
+| 422              | Validation Error    | Invalid/Missing Parameters: Description Returned |
 """
 
 
 job_user_update_list = """
 ## ✅ Permissions Required: 5
+* **
 #### Injest Schema: Path id
 #### Return Schema: UserJobsUpdateList
 **The below table defines the HTTP Status codes that this API may return**
@@ -55,6 +58,7 @@ order_update = """
 ## ✅ Permissions Required: 5
 ## ✅ Consumes A LIST Objects
 ## ✅ Returns A LIST IDs Of Created Updated Or Deleted
+* **
 #### Injest Schema: JobsOrderUpdateList
 #### Return Schema: List
 **The below table defines the HTTP Status codes that this API may return**
@@ -72,6 +76,7 @@ order_update = """
 
 order_list = """
 ## ✅ Permissions Required: 5
+* **
 #### Injest Schema: None
 #### Return Schema: JobsOrderUpdateList
 **The below table defines the HTTP Status codes that this API may return**
@@ -89,13 +94,14 @@ order_list = """
 
 create = """
 ## ✅ Permissions Required: 5
+* **
 #### Injest Schema: JobCreate
 #### Return Schema: JobsGet
 **The below table defines the HTTP Status codes that this API may return**
 
 | Status Code      | Description      | Reason                                           |
 | ---------------- | -----------------| -------------------------------------------------|
-| 201              | Created          | Job Created Returns Brand                        |
+| 201              | Created          | Created Returns Entry                            |
 | 401              | Unauthorized     | Not Logged In                                    |
 | 403              | Forbidden        | Insufficient Permissions                         |
 | 404              | Not Found        | Insert Produced No Results                       |
@@ -106,62 +112,66 @@ create = """
 
 get_all = """
 ## ✅ Permissions Required: 1
+* **
 #### Injest Schema: Optional Path Search
 #### Return Schema: JobsGet
 **The below table defines the HTTP Status codes that this API may return**
 
-| Status Code      | Description          | Reason                                           |
-| ---------------- | ---------------------| -------------------------------------------------|
-| 200              | Job Retrieved        | Successful                                       |
-| 401              | Unauthorized         | Not Logged In                                    |
-| 403              | Forbidden            | Insufficient Permissions                         |
-| 404              | Not Found            | Search Parameters Produced No Results            |
-| 409              | Conflict             | Conflict With Database: Description Returned     |
-| 422              | Validation Error     | Invalid/Missing Parameters: Description Returned |
+| Status Code      | Description         | Reason                                           |
+| ---------------- | -----------------   | -------------------------------------------------|
+| 200              | Entry Retrieved     | Success                                          |
+| 401              | Unauthorized        | Not Logged In                                    |
+| 403              | Forbidden           | Insufficient Permissions                         |
+| 404              | Not Found           | Insert Produced No Results                       |
+| 409              | Conflict            | Conflict With Database: Description Returned     |
+| 422              | Validation Error    | Invalid/Missing Parameters: Description Returned |
 """
 
 get_one = """
 ## ✅ Permissions Required: 1
+* **
 #### Injest Schema: Path id
 #### Return Schema: JobsGet
 **The below table defines the HTTP Status codes that this API may return**
 
 | Status Code      | Description         | Reason                                           |
-| ---------------- | --------------------| -------------------------------------------------|
-| 200              | Job Retrieved       | Successful                                       |
+| ---------------- | -----------------   | -------------------------------------------------|
+| 200              | Entry Retrieved     | Success                                          |
 | 401              | Unauthorized        | Not Logged In                                    |
 | 403              | Forbidden           | Insufficient Permissions                         |
-| 404              | Not Found           | Search Parameters Produced No Results            |
+| 404              | Not Found           | Insert Produced No Results                       |
 | 409              | Conflict            | Conflict With Database: Description Returned     |
-| 422              | Validation Error    | Invalid/Missing Parameters Description           |
+| 422              | Validation Error    | Invalid/Missing Parameters: Description Returned |
 """
 
 update = """
 ## ✅ Permissions Required: 5
+* **
 #### Injest Schema: Path id, Body JobsUpdate
 #### Return Schema: JobsGet
 **The below table defines the HTTP Status codes that this API may return**
 
-| Status Code      | Description         | Reason                                           |
-| ---------------- | --------------------| -------------------------------------------------|
-| 200              | Job Updated         | Successful                                       |
-| 401              | Unauthorized        | Not Logged In                                    |
-| 403              | Forbidden           | Insufficient Permissions                         |
-| 404              | Not Found           | Search Parameters Produced No Results            |
-| 409              | Conflict            | Conflict With Database: Description Returned     |
-| 422              | Validation Error    | Invalid/Missing Parameters: Description Returned |
+| Status Code      | Description      | Reason                                           |
+| ---------------- | -----------------| -------------------------------------------------|
+| 200              | Entry Updated    | Updated Returns Entry                            |
+| 401              | Unauthorized     | Not Logged In                                    |
+| 403              | Forbidden        | Insufficient Permissions                         |
+| 404              | Not Found        | Insert Produced No Results                       |
+| 409              | Conflict         | Conflict With Database: Description Returned     |
+| 422              | Validation Error | Invalid/Missing Parameters: Description Returned |
 """
 
 delete = """
 ## ✅ Permissions Required: 6
 ## ✅ Deleting Jobs Is Generally Discouraged. Deletions Cascade To All Releated Objects
+* **
 #### Injest Schema: Path id
 #### Return Schema: None
 **The below table defines the HTTP Status codes that this API may return**
 
 | Status Code      | Description         | Reason                                           |
 | ---------------- | --------------------| -------------------------------------------------|
-| 204              | Job Deleted         | Successful                                       |
+| 204              | Entry Deleted       | Successful                                       |
 | 401              | Unauthorized        | Not Logged In                                    |
 | 403              | Forbidden           | Insufficient Permissions                         |
 | 404              | Not Found           | Search Parameters Produced No Results            |
