@@ -1,13 +1,14 @@
-from typing import Optional
-from pydantic import BaseModel, confloat, conint
-from datetime import date
-from .classes.cls_universial import Note
+from .classes.cls_commodity import CommodityName, Sap, Inventory
 from .classes.cls_inventory import LastBrew, HopLot
-from .val_users import UserInclude
-from .val_commodity import CommodityInclude
+from pydantic import BaseModel, confloat, conint
 from .val_brands import BrewingBrandInclude
+from .val_commodity import CommodityInclude
+from .classes.cls_universial import Note
+from .val_users import UserInclude
+from typing import Optional
 from pydantic import Extra
 from pydantic import UUID4
+from datetime import date
 
 
 class InvRetrieve(BaseModel):
@@ -38,6 +39,15 @@ class InvLastBrewsInclude(BaseModel):
         orm_mode = True
 
 
+# Bit
+class InvBitGet(BaseModel):
+    inventory: Inventory
+    name_bit: CommodityName
+    sap: Sap
+    final_total: confloat(ge=0)
+    uom: str
+    inventory_date: date
+
 # Material
 class InvMaterialBase(BaseModel):
     final_count: confloat(ge=0, le=100000000)
@@ -51,8 +61,8 @@ class InvMaterialBase(BaseModel):
 class InvMaterialCreate(InvMaterialBase):
     id_commodity: int
 
-    class Config:
-        extra = Extra.allow
+    # class Config:
+    #     extra = Extra.allow
 
 
 class InvMaterialGet(InvMaterialBase):

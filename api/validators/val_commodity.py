@@ -1,10 +1,10 @@
-from typing import Optional
-from pydantic import BaseModel, conint, constr
-from datetime import date
-from .classes.cls_universial import Note
 from .classes.cls_commodity import CommodityName, Sap, Inventory, Type
+from pydantic import BaseModel, conint, constr
 from . val_suppliers import SupplierInclude
+from .classes.cls_universial import Note
 from .val_users import UserInclude
+from typing import Optional
+from datetime import date
 
 
 class CommodityInclude(BaseModel):

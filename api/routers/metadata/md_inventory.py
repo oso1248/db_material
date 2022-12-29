@@ -15,6 +15,28 @@ inv_dates_get_all = """
 | 409              | Conflict         | Conflict With Database: Description Returned     |
 """
 
+
+# Bit Metadata
+inv_bit_get = """
+## ✅ Permissions Required: 1
+## ✅ Commodities With Same ➔ name_bit | sap | unit_of_measurement ➔ Will Be Aggregated In The Inventory
+## ✅ Update Commodities Accordingly
+* **
+#### Ingest Schema: InvRetrieve
+#### Return Schema: InvBitGet
+**The below table defines the HTTP Status codes that this API may return**
+
+| Status Code      | Description         | Reason                                           |
+| ---------------- | -----------------   | -------------------------------------------------|
+| 200              | Entry Retrieved     | Success                                          |
+| 401              | Unauthorized        | Not Logged In                                    |
+| 403              | Forbidden           | Insufficient Permissions                         |
+| 404              | Not Found           | Insert Produced No Results                       |
+| 409              | Conflict            | Conflict With Database: Description Returned     |
+| 422              | Validation Error    | Invalid/Missing Parameters: Description Returned |
+"""
+
+
 # Material Metadata
 inv_material_create = """
 ## ✅ Permissions Required: 3

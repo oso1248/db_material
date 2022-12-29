@@ -43,6 +43,45 @@ def inventory_dates_get_all(limit: int = 10, skip: int = 0, db: Session = Depend
         logger.error(f'{error}')
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+# Inventory Bit
+@router.get("/bit", response_model=List[val_inventory.InvBitGet], description=md_inventory.inv_bit_get, tags=['Inventory Bit'])
+@logger.catch()
+def inventory_bit_get(uuid: val_inventory.InvRetrieve, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
+
+    if current_user.permissions < 1:
+        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+
+    try:
+        data = db.execute("""
+        SELECT inventory, name_bit, sap, SUM(final_total) AS final_total, unit_of_measurement AS uom, inv.inventory_date
+        FROM
+        (SELECT com.name_bit, com.sap, inv.final_total, com.unit_of_measurement, com.inventory, inv.uuid
+        FROM commodity AS com
+        INNER JOIN inventory_material AS inv ON inv.id_commodity = com.id
+        WHERE inv.uuid = :val
+        UNION ALL
+        SELECT com.name_bit, com.sap, inv.final_total, com.unit_of_measurement, com.inventory, inv.uuid
+        FROM commodity AS com
+        INNER JOIN inventory_hop AS inv ON inv.id_commodity = com.id
+        WHERE inv.uuid = :val) AS Z
+        INNER JOIN inventory_uuid AS inv on inv.uuid = z.uuid
+        GROUP BY inventory, name_bit, sap, unit_of_measurement, inv.inventory_date
+        ORDER BY name_bit;
+        """, {'val': uuid.uuid}).fetchall()
+
+        if data[0].sap == None:
+            return Response(status_code=status.HTTP_404_NOT_FOUND)
+
+        return data
+
+    except SQLAlchemyError as error:
+        error = re.sub('[\n"\s+]', " ", ''.join(error.orig.args))
+        return JSONResponse(status_code=status.HTTP_409_CONFLICT, content={'detail': error})
+
+    except Exception as error:
+        logger.error(f'{error}')
+        return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 ### Material Inventory ###
 @router.post("/material", status_code=status.HTTP_201_CREATED, description=md_inventory.inv_material_create, tags=['Inventory Material'])
@@ -61,10 +100,11 @@ def inventory_material_create(commodity: List[val_inventory.InvMaterialCreate], 
 
         item_list = []
         for item in commodity:
-            item.created_by = current_user.id
-            item.updated_by = current_user.id
-            item.uuid = current_uuid
-            item_list.append(item.dict())
+            item = item.dict()
+            item['created_by'] = current_user.id
+            item['updated_by'] = current_user.id
+            item['uuid'] = current_uuid
+            item_list.append(item)
 
         data = db.scalars(insert(mdl_inventory.InventoryMaterial).returning(mdl_inventory.InventoryMaterial), item_list)
         db.commit()
@@ -268,10 +308,11 @@ def inventory_hop_create(commodity: List[val_inventory.InvHopCreate], db: Sessio
 
         item_list = []
         for item in commodity:
-            item.created_by = current_user.id
-            item.updated_by = current_user.id
-            item.uuid = current_uuid
-            item_list.append(item.dict())
+            item = item.dict()
+            item['created_by'] = current_user.id
+            item['updated_by'] = current_user.id
+            item['uuid'] = current_uuid
+            item_list.append(item)
 
         data = db.scalars(insert(mdl_inventory.InventoryHop).returning(mdl_inventory.InventoryHop), item_list)
         db.commit()
