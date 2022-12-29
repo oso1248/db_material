@@ -30,9 +30,9 @@ def user_job_add_update_delete(jobs: List[val_jobs.UserJobsUpdate], db: Session 
             item['created_by'] = current_user.id
             item['updated_by'] = current_user.id
             item_list.append(item)
-
+        print(item_list)
         data = insert(mdl_users.BridgeJobsBrewing).values(item_list)
-        data = data.on_conflict_do_update(constraint="bridge_jobs_brewing_pkey", set_={"skap": data.excluded.skap, "updated_by": data.excluded.updated_by})
+        data = data.on_conflict_do_update(constraint="bridge_jobs_brewing_pkey", set_={"skap": data.excluded.skap, "note": data.excluded.note, "updated_by": data.excluded.updated_by})
         data = data.returning(mdl_users.BridgeJobsBrewing)
         data = db.scalars(data)
         db.commit()
@@ -93,12 +93,11 @@ def user_job_update_list(id: int, db: Session = Depends(get_db), current_user: v
 
     try:
         data = db.execute("""
-        SELECT COALESCE(use.id, :val) AS id_user, job.id AS id_jobs_brewing, (SELECT CONCAT(name_first, ' ', name_last) FROM users WHERE id = :val) AS name_first, job.name_job, COALESCE(brg.skap, 0) AS skap
-        FROM users AS use
-        FULL OUTER JOIN bridge_jobs_brewing AS brg ON brg.id_user = use.id
-        FULL OUTER JOIN jobs_brewing AS job ON job.id = brg.id_jobs_brewing
-        WHERE (use.id = :val OR use.id IS NULL) AND NOT job.id IS NULL
-        ORDER BY job.job_order;
+        SELECT :val AS id_user, job.id_jobs_brewing, (SELECT CONCAT(name_first, ' ', name_last) FROM users WHERE id = :val) AS name_first, job.name_job, COALESCE(brg.skap, 0) AS skap, brg.note
+        FROM (SELECT id_user, id_jobs_brewing, skap, note FROM bridge_jobs_brewing WHERE id_user = :val) AS brg
+        FULL OUTER JOIN (SELECT id AS id_jobs_brewing, name_job FROM jobs_brewing ORDER BY job_order) AS job ON brg.id_jobs_brewing = job.id_jobs_brewing
+        FULL OUTER JOIN (SELECT id, CONCAT(name_first, ' ', name_last) AS name_first FROM users WHERE id = :val) AS use ON use.id = brg.id_user
+        WHERE NOT name_job IS NULL;
         """, {'val': id}).fetchall()
 
         if data[0].name_first == None:

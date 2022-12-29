@@ -29,12 +29,13 @@ def brewing_addition_add_update_delete(addition: List[val_bridges_brewing.Bridge
     try:
         item_list = []
         for item in addition:
-            item.created_by = current_user.id
-            item.updated_by = current_user.id
-            item_list.append(item.dict())
+            item = item.dict()
+            item['created_by'] = current_user.id
+            item['updated_by'] = current_user.id
+            item_list.append(item)
 
         data = insert(mdl_bridges_brewing.BridgeAddition).values(item_list)
-        data = data.on_conflict_do_update(constraint="bridge_addition_pkey", set_={"per_brew": data.excluded.per_brew, "updated_by": data.excluded.updated_by})
+        data = data.on_conflict_do_update(constraint="bridge_addition_pkey", set_={"per_brew": data.excluded.per_brew, "note": data.excluded.note, "updated_by": data.excluded.updated_by})
         data = data.returning(mdl_bridges_brewing.BridgeAddition)
         data = db.scalars(data)
         db.commit()
@@ -84,22 +85,22 @@ def brewing_addition_view_list(db: Session = Depends(get_db), brand: str = "", c
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.get("/addition/{brand}", response_model=List[val_bridges_brewing.BridgeAdditionUpdateGet], description=md_bridges_brewing.addition_update_list, tags=['Brewing Addition'])
+@router.get("/addition/{id}", response_model=List[val_bridges_brewing.BridgeAdditionUpdateList], description=md_bridges_brewing.addition_update_list, tags=['Brewing Addition'])
 @logger.catch()
-def brewing_addition_update_list(brand: str, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
+def brewing_addition_update_list(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
 
     try:
         data = db.execute("""
-        SELECT (SELECT id FROM brand_brewing WHERE name_brand = :val) as id_brand_brewing, com.id as id_commodity, COALESCE(brw.name_brand, :val) AS name_brand, com.name_local, brg.per_brew, brg.note
-        FROM brand_brewing AS brw
-        FULL OUTER JOIN bridge_addition AS brg ON brg.id_brand_brewing = brw.id
-        FULL OUTER JOIN commodity AS com ON com.id = brg.id_commodity
-        WHERE (brw.name_brand = :val OR NOT com.name_local IS NULL) AND com.type = 'Addition'
-        ORDER BY com.name_local
-        """, {'val': brand}).fetchall()
+        SELECT :val AS id_brand_brewing, com.id_commodity, (SELECT name_brand FROM brand_brewing WHERE id = :val) AS name_brand, com.name_local, COALESCE(brg.per_brew, 0) AS per_brew, brg.note
+        FROM (SELECT id_brand_brewing, id_commodity, per_brew, note FROM bridge_addition WHERE id_brand_brewing = :val) AS brg
+        FULL OUTER JOIN (SELECT id AS id_brand_brewing, name_brand FROM brand_brewing WHERE id = :val) AS brw ON brw.id_brand_brewing = brg.id_brand_brewing
+        FULL OUTER JOIN (SELECT id AS id_commodity, name_local FROM commodity WHERE type = 'Addition') AS com ON com.id_commodity = brg.id_commodity
+        WHERE NOT name_local IS NULL
+        ORDER BY com.name_local;
+        """, {'val': id}).fetchall()
 
         if data[0].id_brand_brewing == None:
             return Response(status_code=status.HTTP_404_NOT_FOUND)
@@ -126,12 +127,13 @@ def brewing_kettle_hop_add_update_delete(addition: List[val_bridges_brewing.Brid
     try:
         item_list = []
         for item in addition:
-            item.created_by = current_user.id
-            item.updated_by = current_user.id
-            item_list.append(item.dict())
+            item = item.dict()
+            item['created_by'] = current_user.id
+            item['updated_by'] = current_user.id
+            item_list.append(item)
 
         data = insert(mdl_bridges_brewing.BridgeKettleHop).values(item_list)
-        data = data.on_conflict_do_update(constraint="bridge_kettle_hop_pkey", set_={"per_brew": data.excluded.per_brew, "updated_by": data.excluded.updated_by})
+        data = data.on_conflict_do_update(constraint="bridge_kettle_hop_pkey", set_={"per_brew": data.excluded.per_brew,"note": data.excluded.note, "updated_by": data.excluded.updated_by})
         data = data.returning(mdl_bridges_brewing.BridgeKettleHop)
         data = db.scalars(data)
         db.commit()
@@ -181,23 +183,23 @@ def brewing_kettle_hop_view_list(db: Session = Depends(get_db), brand: str = "",
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.get("/kettlehop/{brand}", response_model=List[val_bridges_brewing.BridgeKettleHopUpdateGet], description=md_bridges_brewing.kettle_hop_update_list, tags=['Brewing Kettle Hop'])
+@router.get("/kettlehop/{id}", response_model=List[val_bridges_brewing.BridgeKettleHopUpdateGet], description=md_bridges_brewing.kettle_hop_update_list, tags=['Brewing Kettle Hop'])
 @logger.catch()
-def brewing_addition_update_list(brand: str, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
+def brewing_addition_update_list(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
 
     try:
         data = db.execute("""
-        SELECT (SELECT id FROM brand_brewing WHERE name_brand = :val) as id_brand_brewing, com.id as id_commodity, COALESCE(brw.name_brand, :val) AS name_brand, com.name_local, brg.per_brew, brg.note
-        FROM brand_brewing AS brw
-        FULL OUTER JOIN bridge_kettle_hop AS brg ON brg.id_brand_brewing = brw.id
-        FULL OUTER JOIN commodity AS com ON com.id = brg.id_commodity
-        WHERE (brw.name_brand = :val OR NOT com.name_local IS NULL) AND com.type = 'Hop'
-        ORDER BY com.name_local
-        """, {'val': brand}).fetchall()
-
+        SELECT :val AS id_brand_brewing, com.id_commodity, (SELECT name_brand FROM brand_brewing WHERE id = :val) AS name_brand, com.name_local, COALESCE(brg.per_brew, 0) AS per_brew, brg.note
+        FROM (SELECT id_brand_brewing, id_commodity, per_brew, note FROM bridge_kettle_hop WHERE id_brand_brewing = :val) AS brg
+        FULL OUTER JOIN (SELECT id AS id_brand_brewing, name_brand FROM brand_brewing WHERE id = :val) AS brw ON brw.id_brand_brewing = brg.id_brand_brewing
+        FULL OUTER JOIN (SELECT id AS id_commodity, name_local FROM commodity WHERE type = 'Hop') AS com ON com.id_commodity = brg.id_commodity
+        WHERE NOT name_local IS NULL
+        ORDER BY com.name_local;
+        """, {'val': id}).fetchall()
+        print(data)
         if data[0].id_brand_brewing == None:
             return Response(status_code=status.HTTP_404_NOT_FOUND)
 
@@ -223,12 +225,13 @@ def brewing_dry_hop_add_update_delete(addition: List[val_bridges_brewing.BridgeD
     try:
         item_list = []
         for item in addition:
-            item.created_by = current_user.id
-            item.updated_by = current_user.id
-            item_list.append(item.dict())
+            item = item.dict()
+            item['created_by'] = current_user.id
+            item['updated_by'] = current_user.id
+            item_list.append(item)
 
         data = insert(mdl_bridges_brewing.BridgeDryHop).values(item_list)
-        data = data.on_conflict_do_update(constraint="bridge_dry_hop_pkey", set_={"per_brew": data.excluded.per_brew, "updated_by": data.excluded.updated_by})
+        data = data.on_conflict_do_update(constraint="bridge_dry_hop_pkey", set_={"per_brew": data.excluded.per_brew, "note": data.excluded.note, "updated_by": data.excluded.updated_by})
         data = data.returning(mdl_bridges_brewing.BridgeDryHop)
         data = db.scalars(data)
         db.commit()
@@ -278,22 +281,22 @@ def brewing_dry_hop_view_list(db: Session = Depends(get_db), brand: str = "", co
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.get("/dryhop/{brand}", response_model=List[val_bridges_brewing.BridgeDryHopUpdateGet], description=md_bridges_brewing.dry_hop_update_list, tags=['Brewing Dry Hop'])
+@router.get("/dryhop/{id}", response_model=List[val_bridges_brewing.BridgeDryHopUpdateGet], description=md_bridges_brewing.dry_hop_update_list, tags=['Brewing Dry Hop'])
 @logger.catch()
-def brewing_dry_hop_update_list(brand: str, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
+def brewing_dry_hop_update_list(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
 
     try:
         data = db.execute("""
-        SELECT (SELECT id FROM brand_brewing WHERE name_brand = :val) as id_brand_brewing, com.id as id_commodity, COALESCE(brw.name_brand, :val) AS name_brand, com.name_local, brg.per_brew, brg.note
-        FROM brand_brewing AS brw
-        FULL OUTER JOIN bridge_dry_hop AS brg ON brg.id_brand_brewing = brw.id
-        FULL OUTER JOIN commodity AS com ON com.id = brg.id_commodity
-        WHERE (brw.name_brand = :val OR NOT com.name_local IS NULL) AND com.type = 'Hop'
-        ORDER BY com.name_local
-        """, {'val': brand}).fetchall()
+        SELECT :val AS id_brand_brewing, com.id_commodity, (SELECT name_brand FROM brand_brewing WHERE id = :val) AS name_brand, com.name_local, COALESCE(brg.per_brew, 0) AS per_brew, brg.note
+        FROM (SELECT id_brand_brewing, id_commodity, per_brew, note FROM bridge_dry_hop WHERE id_brand_brewing = :val) AS brg
+        FULL OUTER JOIN (SELECT id AS id_brand_brewing, name_brand FROM brand_brewing WHERE id = :val) AS brw ON brw.id_brand_brewing = brg.id_brand_brewing
+        FULL OUTER JOIN (SELECT id AS id_commodity, name_local FROM commodity WHERE type = 'Hop') AS com ON com.id_commodity = brg.id_commodity
+        WHERE NOT name_local IS NULL
+        ORDER BY com.name_local;
+        """, {'val': id}).fetchall()
 
         if data[0].id_brand_brewing == None:
             return Response(status_code=status.HTTP_404_NOT_FOUND)
