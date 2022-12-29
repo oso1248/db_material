@@ -136,7 +136,7 @@ def inventory_material_get_all(uuid: val_inventory.InvRetrieve, db: Session = De
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.get("/material/{id}", response_model=val_inventory.InvMaterialGet, description=md_inventory.inv_material_get_all, tags=['Inventory Material'])
+@router.get("/material/{id}", response_model=val_inventory.InvMaterialGet, description=md_inventory.inv_material_get_one, tags=['Inventory Material'])
 @logger.catch()
 def inventory_material_get_one(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
@@ -196,7 +196,7 @@ def inventory_material_update(id: int, commodity: val_inventory.InvMaterialUpdat
 @logger.catch()
 def inventory_material_delete_all(uuid: val_inventory.InvRetrieve, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
-    if current_user.permissions < 5:
+    if current_user.permissions < 4:
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
 
     try:
@@ -408,7 +408,7 @@ def inventory_hop_update(id: int, commodity: val_inventory.InvHopUpdate, db: Ses
 @logger.catch()
 def inventory_hop_delete_all(uuid: val_inventory.InvRetrieve, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
-    if current_user.permissions < 5:
+    if current_user.permissions < 4:
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
 
     try:
@@ -436,7 +436,7 @@ def inventory_hop_delete_all(uuid: val_inventory.InvRetrieve, db: Session = Depe
 @logger.catch()
 def inventory_hop_delete(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
-    if current_user.permissions < 5:
+    if current_user.permissions < 2:
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
 
     try:
@@ -578,7 +578,7 @@ def inventory_last_brews_update(id: int, brews: val_inventory.InvLastBrewsUpdate
 @logger.catch()
 def inventory_last_brews_delete(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
-    if current_user.permissions < 5:
+    if current_user.permissions < 4:
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
 
     try:
@@ -718,7 +718,7 @@ def inventory_hibernate_update(id: int, hibernated: val_inventory.InvHibernateUp
 @logger.catch()
 def inventory_hibernate_delete(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
-    if current_user.permissions < 6:
+    if current_user.permissions < 4:
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
 
     try:

@@ -19,7 +19,7 @@ router = APIRouter(prefix="/commodity", tags=['Commodity'])
 @logger.catch()
 def commodity_create(commodity: val_commodity.CommodityCreate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
-    if current_user.permissions < 5:
+    if current_user.permissions < 4:
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
 
     try:
@@ -92,7 +92,7 @@ def commodity_get_one(id: int, db: Session = Depends(get_db), current_user: val_
 @logger.catch()
 def commodity_update(supplier: val_commodity.CommodityUpdate, id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
-    if current_user.permissions < 5:
+    if current_user.permissions < 4:
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
 
     try:

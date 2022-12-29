@@ -93,7 +93,7 @@ def brand_brewing_get_one(id: int, db: Session = Depends(get_db), current_user: 
 @logger.catch()
 def brand_brewing_update(brand: val_brands.BrewingBrandUpdate, id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
-    if current_user.permissions < 5:
+    if current_user.permissions < 4:
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
 
     try:
@@ -226,7 +226,7 @@ def brand_finishing_get_one(id: int, db: Session = Depends(get_db), current_user
 @logger.catch()
 def brand_finishing_update(brand: val_brands.FinishingBrandUpdate, id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
-    if current_user.permissions < 5:
+    if current_user.permissions < 4:
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
 
     try:
@@ -287,7 +287,7 @@ def brand_finishing_delete(id: int, db: Session = Depends(get_db), current_user:
 # @logger.catch()
 def brand_packaging_create(brand: val_brands.PackagingBrandCreate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
-    if current_user.permissions < 1:
+    if current_user.permissions < 5:
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
 
     try:
@@ -361,7 +361,7 @@ def brand_packaging_get_one(id: int, db: Session = Depends(get_db), current_user
 @logger.catch()
 def brand_packaging_update(brand: val_brands.PackagingBrandUpdate, id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
-    if current_user.permissions < 5:
+    if current_user.permissions < 4:
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
 
     try:
