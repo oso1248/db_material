@@ -41,7 +41,7 @@ addition_update_list = """
 ## ✅ Permissions Required: 1
 ## ✅ Returns A List Used For The Add Update Delete Route
 * **
-#### Injest Schema: Path brand
+#### Injest Schema: Path id
 #### Return Schema: BridgeAdditionUpdateGet
 **The below table defines the HTTP Status codes that this API may return**
 
@@ -98,7 +98,7 @@ kettle_hop_update_list = """
 ## ✅ Permissions Required: 1
 ## ✅ Returns A List Used For The Add Update Delete Route
 * **
-#### Injest Schema: Path brand
+#### Injest Schema: Path id
 #### Return Schema: BridgeKettleHopUpdateGet
 **The below table defines the HTTP Status codes that this API may return**
 
@@ -155,7 +155,7 @@ dry_hop_update_list = """
 ## ✅ Permissions Required: 1
 ## ✅ Returns A List Used For The Add Update Delete Route
 * **
-#### Injest Schema: Path brand
+#### Injest Schema: Path id
 #### Return Schema: BridgeDryHopUpdateGet
 **The below table defines the HTTP Status codes that this API may return**
 

@@ -95,6 +95,7 @@ class UserJobsUpdateList(BaseModel):
     name_first: str
     name_job: JobName
     skap: conint(ge=0, le=5)
+    note: Optional[Note]
 
     class Config:
         orm_mode = True

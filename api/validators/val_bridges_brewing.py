@@ -22,8 +22,8 @@ class BridgeAdditionBase(BaseModel):
 class BridgeAdditionCreate(BridgeAdditionBase):
     pass
 
-    class Config:
-        extra = Extra.allow
+    # class Config:
+    #     extra = Extra.allow
 
 
 class BridgeAdditionGet(BridgeAdditionBase):
@@ -45,7 +45,7 @@ class BridgeAdditionUpdate(BridgeAdditionBase):
         extra = Extra.allow
 
 
-class BridgeAdditionUpdateGet(BridgeAdditionBase):
+class BridgeAdditionUpdateList(BridgeAdditionBase):
     per_brew: Optional[confloat(ge=0, le=10000)]
     name_brand: str
     name_local: str
@@ -68,8 +68,8 @@ class BridgeKettleHopBase(BaseModel):
 class BridgeKettleHopCreate(BridgeKettleHopBase):
     pass
 
-    class Config:
-        extra = Extra.allow
+    # class Config:
+    #     extra = Extra.allow
 
 
 class BridgeKettleHopGet(BridgeKettleHopBase):
@@ -115,8 +115,8 @@ class BridgeDryHopBase(BaseModel):
 class BridgeDryHopCreate(BridgeDryHopBase):
     pass
 
-    class Config:
-        extra = Extra.allow
+    # class Config:
+    #     extra = Extra.allow
 
 
 class BridgeDryHopGet(BridgeDryHopBase):
