@@ -43,10 +43,11 @@ def inventory_dates_get_all(limit: int = 10, skip: int = 0, db: Session = Depend
         logger.error(f'{error}')
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
 # Inventory Bit
 @router.get("/bit", response_model=List[val_inventory.InvBitGet], description=md_inventory.inv_bit_get, tags=['Inventory Bit'])
 @logger.catch()
-def inventory_bit_get(uuid: val_inventory.InvRetrieve, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
+def inventory_bit_get(uuid: val_inventory.InvRetrieve, inventory: str = Query('%___', enum=['Brw', 'Fin', 'Log']), db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
@@ -65,11 +66,12 @@ def inventory_bit_get(uuid: val_inventory.InvRetrieve, db: Session = Depends(get
         INNER JOIN inventory_hop AS inv ON inv.id_commodity = com.id
         WHERE inv.uuid = :val) AS Z
         INNER JOIN inventory_uuid AS inv on inv.uuid = z.uuid
+        WHERE inventory ILIKE :inv
         GROUP BY inventory, name_bit, sap, unit_of_measurement, inv.inventory_date
         ORDER BY name_bit;
-        """, {'val': uuid.uuid}).fetchall()
+        """, {'val': uuid.uuid, 'inv': inventory}).fetchall()
 
-        if data[0].sap == None:
+        if len(data) == 0:
             return Response(status_code=status.HTTP_404_NOT_FOUND)
 
         return data
@@ -110,7 +112,7 @@ def inventory_material_create(commodity: List[val_inventory.InvMaterialCreate], 
         db.commit()
         data = data.all()
 
-        if not data:
+        if len(data) == 0:
             return Response(status_code=status.HTTP_404_NOT_FOUND)
 
         return data
@@ -318,7 +320,7 @@ def inventory_hop_create(commodity: List[val_inventory.InvHopCreate], db: Sessio
         db.commit()
         data = data.all()
 
-        if not data:
+        if len(data) == 0:
             return Response(status_code=status.HTTP_404_NOT_FOUND)
 
         return data
@@ -520,6 +522,7 @@ def inventory_last_brews_create(brews: val_inventory.InvLastBrewsCreate, db: Ses
         db.add(data)
         db.commit()
         db.refresh(data)
+        
         if not data:
             return Response(status_code=status.HTTP_404_NOT_FOUND)
 
@@ -658,6 +661,7 @@ def inventory_hibernate_create(hibernate: val_inventory.InvHibernateCreate, db: 
         db.add(data)
         db.commit()
         db.refresh(data)
+        
         if not data:
             return Response(status_code=status.HTTP_404_NOT_FOUND)
 

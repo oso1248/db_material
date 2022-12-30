@@ -7,7 +7,7 @@ from ..database.database import get_db
 from sqlalchemy.orm import Session
 from ..models import mdl_commodity
 from .metadata import md_commodity
-from typing import List, Optional
+from typing import List
 from loguru import logger
 import re
 

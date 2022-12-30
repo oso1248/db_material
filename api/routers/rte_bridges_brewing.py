@@ -1,15 +1,15 @@
 from fastapi import status, Depends, APIRouter, Response
 from ..validators import val_auth, val_bridges_brewing
+from sqlalchemy.dialects.postgresql import insert
 from ..oauth2.oauth2 import get_current_user
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
-from ..database.database import get_db
-from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy.orm import Session
 from ..models import mdl_bridges_brewing
-from ..models import mdl_brands
-from ..models import mdl_commodity
 from .metadata import md_bridges_brewing
+from ..database.database import get_db
+from ..models import mdl_commodity
+from sqlalchemy.orm import Session
+from ..models import mdl_brands
 from loguru import logger
 from typing import List
 import re
@@ -41,7 +41,7 @@ def brewing_addition_add_update_delete(addition: List[val_bridges_brewing.Bridge
         db.commit()
         data = data.all()
 
-        if not data:
+        if len(data) == 0:
             return Response(status_code=status.HTTP_404_NOT_FOUND)
 
         return data
@@ -139,7 +139,7 @@ def brewing_kettle_hop_add_update_delete(addition: List[val_bridges_brewing.Brid
         db.commit()
         data = data.all()
 
-        if not data:
+        if len(data) == 0:
             return Response(status_code=status.HTTP_404_NOT_FOUND)
 
         return data
@@ -237,7 +237,7 @@ def brewing_dry_hop_add_update_delete(addition: List[val_bridges_brewing.BridgeD
         db.commit()
         data = data.all()
 
-        if not data:
+        if len(data) == 0:
             return Response(status_code=status.HTTP_404_NOT_FOUND)
 
         return data

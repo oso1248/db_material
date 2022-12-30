@@ -1,5 +1,5 @@
-from .. regex import regex_suppliers
 from ... utils.utils import titlecase
+from .. regex import regex_suppliers
 
 
 class SupplierName(str):

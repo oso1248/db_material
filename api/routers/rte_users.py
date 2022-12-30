@@ -1,4 +1,3 @@
-from .metadata import md_users
 from fastapi import status, Depends, APIRouter, Response
 from ..validators import val_users, val_auth
 from ..oauth2.oauth2 import get_current_user
@@ -6,6 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from fastapi.responses import JSONResponse
 from ..database.database import get_db
 from sqlalchemy.orm import Session
+from .metadata import md_users
 from ..models import mdl_users
 from ..utils import utils
 from loguru import logger

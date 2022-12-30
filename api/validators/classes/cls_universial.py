@@ -1,5 +1,5 @@
-from ..regex.regex_universial import regex_note, regex_phone
 from ... utils.utils import convert_phone_number, titlecase, strip_non_numeric
+from ..regex.regex_universial import regex_note, regex_phone
 
 
 class Note(str):
