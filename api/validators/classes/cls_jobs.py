@@ -1,5 +1,5 @@
 from ..regex.regex_jobs import regex_jobs_jobname, regex_jobs_jobarea, regex_jobs_skap
-from ...utils.utils import titlecase, uppercase, strip_non_alphanumeric
+from ...utils.utils import titlecase
 
 
 class JobName(str):

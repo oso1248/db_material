@@ -1,9 +1,9 @@
 from ..validators.val_users import UserInclude
-from .classes.cls_universial import Note
 from .classes.cls_brands import BrandName
+from .classes.cls_universial import Note
+from typing import Optional, List
 from pydantic import BaseModel
 from datetime import date
-from typing import Optional, List
 
 
 # Include Brands

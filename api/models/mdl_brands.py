@@ -1,9 +1,7 @@
 from sqlalchemy import Column, Integer, text, String, Boolean, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.orm import relationship
 from ..database.database import Base
-# uuid = Column(UUID(as_uuid=True), nullable=False, server_default=text('gen_random_uuid()'))
 
 
 class BrandBrewing(Base):

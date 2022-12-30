@@ -1,9 +1,9 @@
 from .classes.cls_users import Eid, Name, Password
-from pydantic import BaseModel, conint
-from datetime import date
 from .classes.cls_jobs import JobName, JobArea
 from .classes.cls_universial import Note
+from pydantic import BaseModel, conint
 from typing import Optional, List
+from datetime import date
 
 
 class Jobs(BaseModel):

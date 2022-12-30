@@ -1,11 +1,11 @@
-from typing import Optional
+from .val_brands import BrewingBrandInclude
+from .val_commodity import CommodityInclude
 from pydantic import BaseModel, confloat
-from datetime import date
 from .classes.cls_universial import Note
 from .val_users import UserInclude
-from .val_commodity import CommodityInclude
-from .val_brands import BrewingBrandInclude
+from typing import Optional
 from pydantic import Extra
+from datetime import date
 
 
 # Bridge Addition

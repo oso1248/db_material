@@ -5,10 +5,10 @@ from .. database.database import get_db
 from sqlalchemy.orm import Session
 from .. validators import val_auth
 from .. models import mdl_users
+from .metadata import md_users
 from .. oauth2 import oauth2
 from .. utils import utils
 from loguru import logger
-from .metadata import md_users
 
 
 router = APIRouter(prefix="/login", tags=['Auth'])

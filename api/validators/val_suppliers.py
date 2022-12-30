@@ -1,9 +1,9 @@
-from typing import Optional
-from pydantic import BaseModel, EmailStr
-from datetime import date
-from .val_users import UserInclude
-from .classes.cls_suppliers import SupplierName
 from .classes.cls_universial import PhoneNumber
+from .classes.cls_suppliers import SupplierName
+from pydantic import BaseModel, EmailStr
+from .val_users import UserInclude
+from typing import Optional
+from datetime import date
 
 
 class SupplierInclude(BaseModel):

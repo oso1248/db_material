@@ -1,5 +1,5 @@
+from ... utils.utils import uppercase
 from .. regex import regex_brands
-from ... utils.utils import uppercase, titlecase
 
 
 class BrandName(str):

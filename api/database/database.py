@@ -1,12 +1,12 @@
 from .. config import settings
 # psycopg2 connection
-import psycopg2
 from psycopg2.extras import RealDictCursor
+import psycopg2
 import time
 # sqlalchemy connection
-from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
 
 
 # psycopg2 connection

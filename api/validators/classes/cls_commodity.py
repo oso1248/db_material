@@ -1,5 +1,5 @@
-from .. regex import regex_commodity
 from ... utils.utils import titlecase
+from .. regex import regex_commodity
 
 
 class CommodityName(str):

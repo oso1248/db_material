@@ -1,6 +1,6 @@
-from .. database.database import Base
 from sqlalchemy import Column, ForeignKey, Integer, TIMESTAMP, Boolean, String, text
 from sqlalchemy.orm import relationship
+from .. database.database import Base
 
 
 class Suppliers(Base):

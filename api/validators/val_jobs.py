@@ -2,9 +2,9 @@ from .classes.cls_jobs import JobName, JobArea
 from ..validators.val_users import UserInclude
 from .classes.cls_universial import Note
 from pydantic import BaseModel, conint
-from datetime import datetime, date
 from typing import Optional, List
 from pydantic import Extra
+from datetime import date
 
 
 class JobInclude(BaseModel):

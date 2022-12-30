@@ -1,6 +1,6 @@
 from sqlalchemy import Column, ForeignKey, Integer, TIMESTAMP, String, text, Numeric
-from .. database.database import Base
 from sqlalchemy.orm import relationship
+from .. database.database import Base
 
 
 class BridgeAddition(Base):
