@@ -31,4 +31,5 @@ tags_metadata = [
     {"name": "Brewing Addition", "description": "Brewing Addition Endpoints", "externalDocs": {"description": "¿Would You Like To Know More?", "url": "https://github.com/oso1248/db_material/blob/master/api/routers/README/BRIDGESBREWING.md"}},
     {"name": "Brewing Kettle Hop", "description": "Brewing Kettle Hop Endpoints", "externalDocs": {"description": "¿Would You Like To Know More?", "url": "https://github.com/oso1248/db_material/blob/master/api/routers/README/BRIDGESBREWING.md"}},
     {"name": "Brewing Dry Hop", "description": "Brewing Dry Hop Endpoints", "externalDocs": {"description": "¿Would You Like To Know More?", "url": "https://github.com/oso1248/db_material/blob/master/api/routers/README/BRIDGESBREWING.md"}},
+    {"name": "Issues", "description": "Issue Endpoints", "externalDocs": {"description": "¿Would You Like To Know More?", "url": "https://github.com/oso1248/db_material/blob/master/api/routers/README/ISSUES.md"}},
 ]
