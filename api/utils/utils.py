@@ -1,5 +1,7 @@
 from passlib.context import CryptContext
+from pydantic.types import UUID4
 import re
+
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
@@ -38,3 +40,16 @@ def strip_non_alphanumeric(num):
 
 def convert_brew_number(brew):
     return re.sub(r'([A-Z\d]{4})(\d{5})', r'\1 \2', brew)
+
+
+def convert_skalar_list(list, id: int, uuid: UUID4 = None):
+    item_list = []
+    for item in list:
+        item = item.dict()
+        item['created_by'] = id
+        item['updated_by'] = id
+        if uuid:
+            item['uuid'] = uuid
+        item_list.append(item)
+
+    return item_list

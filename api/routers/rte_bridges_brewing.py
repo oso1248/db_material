@@ -1,6 +1,7 @@
 from fastapi import status, Depends, APIRouter, Response
 from ..validators import val_auth, val_bridges_brewing
 from sqlalchemy.dialects.postgresql import insert
+from ..utils.utils import convert_skalar_list
 from ..oauth2.oauth2 import get_current_user
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
@@ -27,12 +28,7 @@ def brewing_addition_add_update_delete(addition: List[val_bridges_brewing.Bridge
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
 
     try:
-        item_list = []
-        for item in addition:
-            item = item.dict()
-            item['created_by'] = current_user.id
-            item['updated_by'] = current_user.id
-            item_list.append(item)
+        item_list = convert_skalar_list(addition, current_user.id)
 
         data = insert(mdl_bridges_brewing.BridgeAddition).values(item_list)
         data = data.on_conflict_do_update(constraint="bridge_addition_pkey", set_={"per_brew": data.excluded.per_brew, "note": data.excluded.note, "updated_by": data.excluded.updated_by})
@@ -125,12 +121,7 @@ def brewing_kettle_hop_add_update_delete(addition: List[val_bridges_brewing.Brid
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
 
     try:
-        item_list = []
-        for item in addition:
-            item = item.dict()
-            item['created_by'] = current_user.id
-            item['updated_by'] = current_user.id
-            item_list.append(item)
+        item_list = convert_skalar_list(addition, current_user.id)
 
         data = insert(mdl_bridges_brewing.BridgeKettleHop).values(item_list)
         data = data.on_conflict_do_update(constraint="bridge_kettle_hop_pkey", set_={"per_brew": data.excluded.per_brew,"note": data.excluded.note, "updated_by": data.excluded.updated_by})
@@ -223,12 +214,7 @@ def brewing_dry_hop_add_update_delete(addition: List[val_bridges_brewing.BridgeD
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
 
     try:
-        item_list = []
-        for item in addition:
-            item = item.dict()
-            item['created_by'] = current_user.id
-            item['updated_by'] = current_user.id
-            item_list.append(item)
+        item_list = convert_skalar_list(addition, current_user.id)
 
         data = insert(mdl_bridges_brewing.BridgeDryHop).values(item_list)
         data = data.on_conflict_do_update(constraint="bridge_dry_hop_pkey", set_={"per_brew": data.excluded.per_brew, "note": data.excluded.note, "updated_by": data.excluded.updated_by})

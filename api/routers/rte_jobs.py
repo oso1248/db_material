@@ -1,5 +1,6 @@
 from fastapi import status, Depends, APIRouter, Response
 from sqlalchemy.dialects.postgresql import insert
+from ..utils.utils import convert_skalar_list
 from ..validators import val_auth, val_jobs
 from ..oauth2.oauth2 import get_current_user
 from sqlalchemy.exc import SQLAlchemyError
@@ -12,7 +13,6 @@ from loguru import logger
 from typing import List
 import re
 
-
 router = APIRouter(prefix="/jobs")
 
 
@@ -24,13 +24,8 @@ def user_job_add_update_delete(jobs: List[val_jobs.UserJobsUpdate], db: Session 
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
 
     try:
-        item_list = []
-        for item in jobs:
-            item = item.dict()
-            item['created_by'] = current_user.id
-            item['updated_by'] = current_user.id
-            item_list.append(item)
-        print(item_list)
+        item_list = convert_skalar_list(jobs, current_user.id)
+
         data = insert(mdl_users.BridgeJobsBrewing).values(item_list)
         data = data.on_conflict_do_update(constraint="bridge_jobs_brewing_pkey", set_={"skap": data.excluded.skap, "note": data.excluded.note, "updated_by": data.excluded.updated_by})
         data = data.returning(mdl_users.BridgeJobsBrewing)
@@ -122,16 +117,14 @@ def job_order_update(jobs: List[val_jobs.JobsOrderUpdateList], db: Session = Dep
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
 
     try:
-        item_list = []
         order_list = []
         for item in jobs:
-            item = item.dict()
-            item['created_by'] = current_user.id
-            item['updated_by'] = current_user.id
-            item_list.append(item)
+            order_list.append(item.job_order)
 
         if len(order_list) > len(set(order_list)):
-            return JSONResponse(status_code=status.HTTP_409_CONFLICT, content={'detail': "duplicate numbers in order list"})
+            return JSONResponse(status_code=status.HTTP_409_CONFLICT, content={'detail': "duplicate numbers in job_order"})
+
+        item_list = convert_skalar_list(jobs, current_user.id)
 
         data = insert(mdl_users.JobsBrewing).values(item_list)
         data = data.on_conflict_do_update(constraint="jobs_brewing_name_job_key", set_={"job_order": data.excluded.job_order, "updated_by": data.excluded.updated_by})
