@@ -2,6 +2,7 @@ from ..utils.utils_uuid import get_uuid, check_last_brews, check_hop_inventory, 
 from fastapi import status, Depends, APIRouter, Response, Query
 from ..models import mdl_commodity, mdl_inventory
 from ..validators import val_auth, val_inventory
+from ..utils.utils import convert_skalar_list
 from ..oauth2.oauth2 import get_current_user
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
@@ -100,13 +101,7 @@ def inventory_material_create(commodity: List[val_inventory.InvMaterialCreate], 
         if is_inventory:
             return JSONResponse(status_code=status.HTTP_409_CONFLICT, content={'detail': "inventory already exists. delete privious inventory first"})
 
-        item_list = []
-        for item in commodity:
-            item = item.dict()
-            item['created_by'] = current_user.id
-            item['updated_by'] = current_user.id
-            item['uuid'] = current_uuid
-            item_list.append(item)
+        item_list = convert_skalar_list(commodity, current_user.id, current_uuid)
 
         data = db.scalars(insert(mdl_inventory.InventoryMaterial).returning(mdl_inventory.InventoryMaterial), item_list)
         db.commit()
@@ -308,13 +303,7 @@ def inventory_hop_create(commodity: List[val_inventory.InvHopCreate], db: Sessio
         elif is_inventory:
             return JSONResponse(status_code=status.HTTP_409_CONFLICT, content={'detail': "inventory already exists. delete privious inventory first"})
 
-        item_list = []
-        for item in commodity:
-            item = item.dict()
-            item['created_by'] = current_user.id
-            item['updated_by'] = current_user.id
-            item['uuid'] = current_uuid
-            item_list.append(item)
+        item_list = convert_skalar_list(commodity, current_user.id, current_uuid)
 
         data = db.scalars(insert(mdl_inventory.InventoryHop).returning(mdl_inventory.InventoryHop), item_list)
         db.commit()
