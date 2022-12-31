@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int
     USER_INSERT: str
+    GIT_TOKEN: str
 
     class Config:
         env_file = '.env'
