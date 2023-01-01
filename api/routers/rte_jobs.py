@@ -1,8 +1,9 @@
 from fastapi import status, Depends, APIRouter, Response
 from sqlalchemy.dialects.postgresql import insert
 from ..utils.utils import convert_skalar_list
-from ..validators import val_auth, val_jobs
+from ratelimit import limits, sleep_and_retry
 from ..oauth2.oauth2 import get_current_user
+from ..validators import val_auth, val_jobs
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi.responses import JSONResponse
 from ..database.database import get_db
@@ -13,11 +14,18 @@ from loguru import logger
 from typing import List
 import re
 
+
+LIMIT_SECONDS = 10
+LIMIT_CALLS = 20
+
+
 router = APIRouter(prefix="/jobs")
 
 
 @router.post("/users", status_code=status.HTTP_202_ACCEPTED, description=md_jobs.job_user_update, tags=['User Jobs'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def user_job_add_update_delete(jobs: List[val_jobs.UserJobsUpdate], db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
     # Delete Is From Function In Database That Delete All Rows Where skap = 0
     if current_user.permissions < 5:
@@ -49,6 +57,8 @@ def user_job_add_update_delete(jobs: List[val_jobs.UserJobsUpdate], db: Session 
 
 @router.get("/users", response_model=List[val_jobs.BridgeUserJobsGet], description=md_jobs.job_user_view_list, tags=['User Jobs'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def user_job_view_list(db: Session = Depends(get_db), eid: str = "", job: str = "", limit: int = 50, current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 5:
@@ -78,6 +88,8 @@ def user_job_view_list(db: Session = Depends(get_db), eid: str = "", job: str = 
 
 @router.get("/users/{id}", response_model=List[val_jobs.UserJobsUpdateList], description=md_jobs.job_user_update_list, tags=['User Jobs'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def user_job_update_list(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 5:
@@ -111,6 +123,8 @@ def user_job_update_list(id: int, db: Session = Depends(get_db), current_user: v
 
 @router.post("/order", status_code=status.HTTP_202_ACCEPTED, description=md_jobs.order_update, tags=['Jobs'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def job_order_update(jobs: List[val_jobs.JobsOrderUpdateList], db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 5:
@@ -150,6 +164,8 @@ def job_order_update(jobs: List[val_jobs.JobsOrderUpdateList], db: Session = Dep
 
 @router.get("/order", response_model=List[val_jobs.JobsOrderUpdateList], description=md_jobs.order_list, tags=['Jobs'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def job_order_update_list(db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 5:
@@ -179,6 +195,8 @@ def job_order_update_list(db: Session = Depends(get_db), current_user: val_auth.
 
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=val_jobs.JobsGet, description=md_jobs.create, tags=['Jobs'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def jobs_create(job: val_jobs.JobCreate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 5:
@@ -212,6 +230,8 @@ def jobs_create(job: val_jobs.JobCreate, db: Session = Depends(get_db), current_
 
 @router.get("", response_model=List[val_jobs.JobsGet], description=md_jobs.get_all, tags=['Jobs'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def jobs_get_all(db: Session = Depends(get_db), active: bool = True, current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
@@ -237,6 +257,8 @@ def jobs_get_all(db: Session = Depends(get_db), active: bool = True, current_use
 
 @router.get("/{id}", response_model=val_jobs.JobsGet, description=md_jobs.get_one, tags=['Jobs'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def jobs_get_one(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
@@ -262,6 +284,8 @@ def jobs_get_one(id: int, db: Session = Depends(get_db), current_user: val_auth.
 
 @router.put("/{id}", response_model=val_jobs.JobsGet, description=md_jobs.update, tags=['Jobs'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def jobs_update(job: val_jobs.JobsUpdate, id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 5:
@@ -294,6 +318,8 @@ def jobs_update(job: val_jobs.JobsUpdate, id: int, db: Session = Depends(get_db)
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT, description=md_jobs.delete, tags=['Jobs'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def jobs_delete(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 6:

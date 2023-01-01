@@ -2,6 +2,7 @@ from fastapi import status, Depends, APIRouter, Response
 from ..validators import val_auth, val_bridges_brewing
 from sqlalchemy.dialects.postgresql import insert
 from ..utils.utils import convert_skalar_list
+from ratelimit import limits, sleep_and_retry
 from ..oauth2.oauth2 import get_current_user
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
@@ -16,12 +17,18 @@ from typing import List
 import re
 
 
+LIMIT_SECONDS = 10
+LIMIT_CALLS = 20
+
+
 router = APIRouter(prefix="/bridgesbrewing")
 
 
 ### Brewing Additions ###
 @router.post("/addition", status_code=status.HTTP_202_ACCEPTED, description=md_bridges_brewing.addition_add_update_delete, tags=['Brewing Addition'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def brewing_addition_add_update_delete(addition: List[val_bridges_brewing.BridgeAdditionCreate], db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 5:
@@ -54,6 +61,8 @@ def brewing_addition_add_update_delete(addition: List[val_bridges_brewing.Bridge
 
 @router.get("/addition", response_model=List[val_bridges_brewing.BridgeAdditionGet], description=md_bridges_brewing.addition_view_list, tags=['Brewing Addition'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def brewing_addition_view_list(db: Session = Depends(get_db), brand: str = "", commodity: str = "", limit: int = 20, current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
@@ -83,6 +92,8 @@ def brewing_addition_view_list(db: Session = Depends(get_db), brand: str = "", c
 
 @router.get("/addition/{id}", response_model=List[val_bridges_brewing.BridgeAdditionUpdateList], description=md_bridges_brewing.addition_update_list, tags=['Brewing Addition'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def brewing_addition_update_list(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
@@ -115,6 +126,8 @@ def brewing_addition_update_list(id: int, db: Session = Depends(get_db), current
 ### Brewing Kettle Hop ###
 @router.post("/kettlehop", status_code=status.HTTP_202_ACCEPTED, description=md_bridges_brewing.kettle_hop_add_update_delete, tags=['Brewing Kettle Hop'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def brewing_kettle_hop_add_update_delete(addition: List[val_bridges_brewing.BridgeKettleHopCreate], db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 5:
@@ -147,6 +160,8 @@ def brewing_kettle_hop_add_update_delete(addition: List[val_bridges_brewing.Brid
 
 @router.get("/kettlehop", response_model=List[val_bridges_brewing.BridgeKettleHopGet], description=md_bridges_brewing.kettle_hop_view_list, tags=['Brewing Kettle Hop'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def brewing_kettle_hop_view_list(db: Session = Depends(get_db), brand: str = "", commodity: str = "", limit: int = 20, current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
@@ -176,6 +191,8 @@ def brewing_kettle_hop_view_list(db: Session = Depends(get_db), brand: str = "",
 
 @router.get("/kettlehop/{id}", response_model=List[val_bridges_brewing.BridgeKettleHopUpdateGet], description=md_bridges_brewing.kettle_hop_update_list, tags=['Brewing Kettle Hop'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def brewing_addition_update_list(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
@@ -208,6 +225,8 @@ def brewing_addition_update_list(id: int, db: Session = Depends(get_db), current
 ### Brewing Dry Hop ###
 @router.post("/dryhop", status_code=status.HTTP_202_ACCEPTED, description=md_bridges_brewing.dry_hop_add_update_delete, tags=['Brewing Dry Hop'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def brewing_dry_hop_add_update_delete(addition: List[val_bridges_brewing.BridgeDryHopCreate], db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 5:
@@ -240,6 +259,8 @@ def brewing_dry_hop_add_update_delete(addition: List[val_bridges_brewing.BridgeD
 
 @router.get("/dryhop", response_model=List[val_bridges_brewing.BridgeDryHopGet], description=md_bridges_brewing.dry_hop_view_list, tags=['Brewing Dry Hop'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def brewing_dry_hop_view_list(db: Session = Depends(get_db), brand: str = "", commodity: str = "", limit: int = 20, current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
@@ -269,6 +290,8 @@ def brewing_dry_hop_view_list(db: Session = Depends(get_db), brand: str = "", co
 
 @router.get("/dryhop/{id}", response_model=List[val_bridges_brewing.BridgeDryHopUpdateGet], description=md_bridges_brewing.dry_hop_update_list, tags=['Brewing Dry Hop'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def brewing_dry_hop_update_list(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:

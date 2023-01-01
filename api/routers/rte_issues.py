@@ -1,5 +1,6 @@
 from fastapi import status, Depends, APIRouter, Response, Query
 from ..validators import val_auth, val_issues
+from ratelimit import limits, sleep_and_retry
 from ..oauth2.oauth2 import get_current_user
 from fastapi.responses import JSONResponse
 from .metadata import md_issues
@@ -8,6 +9,10 @@ from loguru import logger
 import pendulum as ptime
 from typing import List
 import httpx
+
+
+LIMIT_SECONDS = 10
+LIMIT_CALLS = 20
 
 
 token = settings.GIT_TOKEN
@@ -27,6 +32,8 @@ def git_assignee(name: str):
 
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=val_issues.IssuesCreateGet, description=md_issues.create)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 async def issues_create(issue: val_issues.IssuesCreate, assignee: str = Query(None, enum=['Adam']),  current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 2:
@@ -62,6 +69,8 @@ async def issues_create(issue: val_issues.IssuesCreate, assignee: str = Query(No
 
 @router.get("", response_model=List[val_issues.IssuesCreateGet], description=md_issues.get)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 async def issues_get(state: str = Query('open', enum=['open', 'closed']), label: str = Query('', enum=['bug', 'design', 'enhancement', 'question']), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:

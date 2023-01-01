@@ -3,6 +3,7 @@ from fastapi import status, Depends, APIRouter, Response, Query
 from ..models import mdl_commodity, mdl_inventory
 from ..validators import val_auth, val_inventory
 from ..utils.utils import convert_skalar_list
+from ratelimit import limits, sleep_and_retry
 from ..oauth2.oauth2 import get_current_user
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
@@ -16,12 +17,18 @@ from typing import List
 import re
 
 
+LIMIT_SECONDS = 10
+LIMIT_CALLS = 20
+
+
 router = APIRouter(prefix="/inventory")
 
 
 ### Inventory Dates ###
 @router.get("/dates", response_model=List[val_inventory.InvDatesGet], description=md_inventory.inv_dates_get_all, tags=['Inventory Dates'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def inventory_dates_get_all(limit: int = 10, skip: int = 0, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
@@ -48,6 +55,8 @@ def inventory_dates_get_all(limit: int = 10, skip: int = 0, db: Session = Depend
 # Inventory Bit
 @router.get("/bit", response_model=List[val_inventory.InvBitGet], description=md_inventory.inv_bit_get, tags=['Inventory Bit'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def inventory_bit_get(uuid: val_inventory.InvRetrieve, inventory: str = Query('%___', enum=['Brw', 'Fin', 'Log']), db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
@@ -89,6 +98,8 @@ def inventory_bit_get(uuid: val_inventory.InvRetrieve, inventory: str = Query('%
 ### Material Inventory ###
 @router.post("/material", status_code=status.HTTP_201_CREATED, description=md_inventory.inv_material_create, tags=['Inventory Material'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def inventory_material_create(commodity: List[val_inventory.InvMaterialCreate], db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 3:
@@ -124,6 +135,8 @@ def inventory_material_create(commodity: List[val_inventory.InvMaterialCreate], 
 
 @router.post("/material/{uuid}", response_model=val_inventory.InvMaterialGet, status_code=status.HTTP_201_CREATED, description=md_inventory.inv_material_add, tags=['Inventory Material'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def inventory_material_add(uuid: UUID4, commodity: val_inventory.InvMaterialCreate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 3:
@@ -150,6 +163,8 @@ def inventory_material_add(uuid: UUID4, commodity: val_inventory.InvMaterialCrea
 
 @router.get("/material", response_model=List[val_inventory.InvMaterialGet], description=md_inventory.inv_material_get_all, tags=['Inventory Material'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def inventory_material_get_all(uuid: val_inventory.InvRetrieve, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
@@ -175,6 +190,8 @@ def inventory_material_get_all(uuid: val_inventory.InvRetrieve, db: Session = De
 
 @router.get("/material/{id}", response_model=val_inventory.InvMaterialGet, description=md_inventory.inv_material_get_one, tags=['Inventory Material'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def inventory_material_get_one(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
@@ -200,6 +217,8 @@ def inventory_material_get_one(id: int, db: Session = Depends(get_db), current_u
 
 @router.put("/material/{id}", response_model=val_inventory.InvMaterialGet, description=md_inventory.inv_material_update, tags=['Inventory Material'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def inventory_material_update(id: int, commodity: val_inventory.InvMaterialUpdate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 3:
@@ -231,6 +250,8 @@ def inventory_material_update(id: int, commodity: val_inventory.InvMaterialUpdat
 
 @router.delete("/material/delete", status_code=status.HTTP_204_NO_CONTENT, description=md_inventory.inv_material_delete_all, tags=['Inventory Material'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def inventory_material_delete_all(uuid: val_inventory.InvRetrieve, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 4:
@@ -259,6 +280,8 @@ def inventory_material_delete_all(uuid: val_inventory.InvRetrieve, db: Session =
 
 @router.delete("/material/delete/{id}", status_code=status.HTTP_204_NO_CONTENT, description=md_inventory.inv_material_delete, tags=['Inventory Material'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def inventory_material_delete(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 5:
@@ -288,6 +311,8 @@ def inventory_material_delete(id: int, db: Session = Depends(get_db), current_us
 ### Hop Inventory ###
 @router.post("/hop", status_code=status.HTTP_201_CREATED, description=md_inventory.inv_hop_create, tags=['Inventory Hop'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def inventory_hop_create(commodity: List[val_inventory.InvHopCreate], db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 2:
@@ -326,6 +351,8 @@ def inventory_hop_create(commodity: List[val_inventory.InvHopCreate], db: Sessio
 
 @router.post("/hop/{uuid}", response_model=val_inventory.InvHopGet, status_code=status.HTTP_201_CREATED, description=md_inventory.inv_hop_add, tags=['Inventory Hop'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def inventory_hop_add(uuid: UUID4, commodity: val_inventory.InvHopCreate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 2:
@@ -357,6 +384,8 @@ def inventory_hop_add(uuid: UUID4, commodity: val_inventory.InvHopCreate, db: Se
 
 @router.get("/hop", response_model=List[val_inventory.InvHopGet], description=md_inventory.inv_hop_get_all, tags=['Inventory Hop'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def inventory_hop_get_all(uuid: val_inventory.InvRetrieve, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
@@ -382,6 +411,8 @@ def inventory_hop_get_all(uuid: val_inventory.InvRetrieve, db: Session = Depends
 
 @router.get("/hop/{id}", response_model=val_inventory.InvHopGet, description=md_inventory.inv_hop_get_one, tags=['Inventory Hop'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def inventory_hop_get_one(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
@@ -407,6 +438,8 @@ def inventory_hop_get_one(id: int, db: Session = Depends(get_db), current_user: 
 
 @router.put("/hop/{id}", response_model=val_inventory.InvHopGet, description=md_inventory.inv_hop_update, tags=['Inventory Hop'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def inventory_hop_update(id: int, commodity: val_inventory.InvHopUpdate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 3:
@@ -438,6 +471,8 @@ def inventory_hop_update(id: int, commodity: val_inventory.InvHopUpdate, db: Ses
 
 @router.delete("/hop/delete", status_code=status.HTTP_204_NO_CONTENT, description=md_inventory.inv_hop_delete_all, tags=['Inventory Hop'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def inventory_hop_delete_all(uuid: val_inventory.InvRetrieve, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 4:
@@ -466,6 +501,8 @@ def inventory_hop_delete_all(uuid: val_inventory.InvRetrieve, db: Session = Depe
 
 @router.delete("/hop/delete/{id}", status_code=status.HTTP_204_NO_CONTENT, description=md_inventory.inv_hop_delete, tags=['Inventory Hop'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def inventory_hop_delete(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 2:
@@ -495,6 +532,8 @@ def inventory_hop_delete(id: int, db: Session = Depends(get_db), current_user: v
 ### Last Brews Inventory ###
 @router.post("/lastbrews", status_code=status.HTTP_201_CREATED, response_model=val_inventory.InvLastBrewsGet, description=md_inventory.inv_last_brews_create, tags=['Inventory Last Brews'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def inventory_last_brews_create(brews: val_inventory.InvLastBrewsCreate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 2:
@@ -528,6 +567,8 @@ def inventory_last_brews_create(brews: val_inventory.InvLastBrewsCreate, db: Ses
 
 @router.get("/lastbrews", response_model=List[val_inventory.InvLastBrewsGet], description=md_inventory.inv_last_brews_get_all, tags=['Inventory Last Brews'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def inventory_last_brews_get_all(limit: int = 10, skip: int = 0, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
@@ -553,6 +594,8 @@ def inventory_last_brews_get_all(limit: int = 10, skip: int = 0, db: Session = D
 
 @router.get("/lastbrews/{id}", response_model=val_inventory.InvLastBrewsGet, description=md_inventory.inv_last_brews_get_one, tags=['Inventory Last Brews'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def inventory_last_brews_get_one(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
@@ -578,6 +621,8 @@ def inventory_last_brews_get_one(id: int, db: Session = Depends(get_db), current
 
 @router.put("/lastbrews/{id}", response_model=val_inventory.InvLastBrewsGet, description=md_inventory.inv_last_brews_update, tags=['Inventory Last Brews'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def inventory_last_brews_update(id: int, brews: val_inventory.InvLastBrewsUpdate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 2:
@@ -609,6 +654,8 @@ def inventory_last_brews_update(id: int, brews: val_inventory.InvLastBrewsUpdate
 
 @router.delete("/lastbrews/delete/{id}", status_code=status.HTTP_204_NO_CONTENT, description=md_inventory.inv_last_brews_delete, tags=['Inventory Last Brews'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def inventory_last_brews_delete(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 4:
@@ -638,6 +685,8 @@ def inventory_last_brews_delete(id: int, db: Session = Depends(get_db), current_
 ### Hibernate Inventory ###
 @router.post("/hibernate", status_code=status.HTTP_201_CREATED, response_model=val_inventory.InvHibernateGet, description=md_inventory.inv_hibernate_create, tags=['Inventory Hibernate'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def inventory_hibernate_create(hibernate: val_inventory.InvHibernateCreate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 2:
@@ -667,6 +716,8 @@ def inventory_hibernate_create(hibernate: val_inventory.InvHibernateCreate, db: 
 
 @router.get("/hibernate", response_model=List[val_inventory.InvHibernateGet], description=md_inventory.inv_hibernate_get_all, tags=['Inventory Hibernate'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def inventory_hibernate_get_all(limit: int = 30, skip: int = 0, complete: bool = Query(False, enum=[True, False]), db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
@@ -692,6 +743,8 @@ def inventory_hibernate_get_all(limit: int = 30, skip: int = 0, complete: bool =
 
 @router.get("/hibernate/{id}", response_model=val_inventory.InvHibernateGet, description=md_inventory.inv_hibernate_get_one, tags=['Inventory Hibernate'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def inventory_hibernate_get_one(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
@@ -717,6 +770,8 @@ def inventory_hibernate_get_one(id: int, db: Session = Depends(get_db), current_
 
 @router.put("/hibernate/{id}", response_model=val_inventory.InvHibernateGet, description=md_inventory.inv_hibernate_update, tags=['Inventory Hibernate'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def inventory_hibernate_update(id: int, hibernated: val_inventory.InvHibernateUpdate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 2:
@@ -750,6 +805,8 @@ def inventory_hibernate_update(id: int, hibernated: val_inventory.InvHibernateUp
 
 @router.delete("/hibernate/delete/{id}", status_code=status.HTTP_204_NO_CONTENT, description=md_inventory.inv_hibernate_delete, tags=['Inventory Hibernate'])
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def inventory_hibernate_delete(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 4:

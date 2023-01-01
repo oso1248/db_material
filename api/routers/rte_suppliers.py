@@ -1,5 +1,6 @@
 from fastapi import status, Depends, APIRouter, Response
 from ..validators import val_auth, val_suppliers
+from ratelimit import limits, sleep_and_retry
 from ..oauth2.oauth2 import get_current_user
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
@@ -12,11 +13,17 @@ from typing import List
 import re
 
 
+LIMIT_SECONDS = 10
+LIMIT_CALLS = 20
+
+
 router = APIRouter(prefix="/suppliers", tags=['Suppliers'])
 
 
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=val_suppliers.SupplierGet, description=md_suppliers.suppliers_create)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def supplier_create(supplier: val_suppliers.SupplierCreate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 5:
@@ -43,6 +50,8 @@ def supplier_create(supplier: val_suppliers.SupplierCreate, db: Session = Depend
 
 @router.get("", response_model=List[val_suppliers.SupplierGet], description=md_suppliers.suppliers_get_all)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def supplier_get_all(db: Session = Depends(get_db), active: bool = True, current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
@@ -66,6 +75,8 @@ def supplier_get_all(db: Session = Depends(get_db), active: bool = True, current
 
 @router.get("/{id}", response_model=val_suppliers.SupplierGet, description=md_suppliers.suppliers_get_one)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def supplier_get_one(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
@@ -90,6 +101,8 @@ def supplier_get_one(id: int, db: Session = Depends(get_db), current_user: val_a
 
 @router.put("/{id}", response_model=val_suppliers.SupplierGet, description=md_suppliers.suppliers_update)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def supplier_update(supplier: val_suppliers.SupplierUpdate, id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 4:
@@ -121,6 +134,8 @@ def supplier_update(supplier: val_suppliers.SupplierUpdate, id: int, db: Session
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT, description=md_suppliers.suppliers_delete)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def supplier_delete(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 7:
