@@ -1,5 +1,6 @@
 from fastapi import status, Depends, APIRouter, Response, Query
 from ..validators import val_auth, val_commodity
+from ratelimit import limits, sleep_and_retry
 from ..oauth2.oauth2 import get_current_user
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
@@ -12,11 +13,17 @@ from loguru import logger
 import re
 
 
+LIMIT_SECONDS = 10
+LIMIT_CALLS = 20
+
+
 router = APIRouter(prefix="/commodity", tags=['Commodity'])
 
 
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=val_commodity.CommodityGet, description=md_commodity.commodity_create)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def commodity_create(commodity: val_commodity.CommodityCreate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 4:
@@ -43,6 +50,8 @@ def commodity_create(commodity: val_commodity.CommodityCreate, db: Session = Dep
 
 @router.get("", response_model=List[val_commodity.CommodityGet], description=md_commodity.commodity_get_all)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def commodity_get_all(db: Session = Depends(get_db), active: bool = True, type: str = Query("", enum=['Hop', 'Addition', 'Injection', 'Chemical']), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
@@ -66,6 +75,8 @@ def commodity_get_all(db: Session = Depends(get_db), active: bool = True, type: 
 
 @router.get("/{id}", response_model=val_commodity.CommodityGet, description=md_commodity.commodity_get_one)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def commodity_get_one(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
@@ -90,6 +101,8 @@ def commodity_get_one(id: int, db: Session = Depends(get_db), current_user: val_
 
 @router.put("/{id}", response_model=val_commodity.CommodityGet, description=md_commodity.commodity_update)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def commodity_update(supplier: val_commodity.CommodityUpdate, id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 4:
@@ -121,6 +134,8 @@ def commodity_update(supplier: val_commodity.CommodityUpdate, id: int, db: Sessi
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT, description=md_commodity.commodity_delete)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def commodity_delete(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 7:

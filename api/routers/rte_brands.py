@@ -1,5 +1,6 @@
 from fastapi import status, Depends, APIRouter, Response
 from ..validators import val_brands, val_auth
+from ratelimit import limits, sleep_and_retry
 from ..oauth2.oauth2 import get_current_user
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
@@ -12,12 +13,18 @@ from typing import List
 import re
 
 
+LIMIT_SECONDS = 10
+LIMIT_CALLS = 20
+
+
 router = APIRouter(prefix="/brand")
 
 
 # Brand Brewing
 @router.post("/brewing", status_code=status.HTTP_201_CREATED, response_model=val_brands.BrewingBrandGet, tags=['Brands Brewing'], description=md_brands.brewing_create)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def brand_brewing_create(brand: val_brands.BrewingBrandCreate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 5:
@@ -44,6 +51,8 @@ def brand_brewing_create(brand: val_brands.BrewingBrandCreate, db: Session = Dep
 
 @router.get("/brewing", response_model=List[val_brands.BrewingBrandGet], tags=['Brands Brewing'], description=md_brands.brewing_get_all)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def brand_brewing_get_all(db: Session = Depends(get_db), active: bool = True, current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
@@ -67,6 +76,8 @@ def brand_brewing_get_all(db: Session = Depends(get_db), active: bool = True, cu
 
 @router.get("/brewing/{id}", response_model=val_brands.BrewingBrandGet, tags=['Brands Brewing'], description=md_brands.brewing_get_one)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def brand_brewing_get_one(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
@@ -91,6 +102,8 @@ def brand_brewing_get_one(id: int, db: Session = Depends(get_db), current_user: 
 
 @router.put("/brewing/{id}", response_model=val_brands.BrewingBrandGet, tags=['Brands Brewing'], description=md_brands.brewing_update)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def brand_brewing_update(brand: val_brands.BrewingBrandUpdate, id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 4:
@@ -122,6 +135,8 @@ def brand_brewing_update(brand: val_brands.BrewingBrandUpdate, id: int, db: Sess
 
 @router.delete("/brewing/{id}", status_code=status.HTTP_204_NO_CONTENT, tags=['Brands Brewing'], description=md_brands.brewing_delete)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def brand_brewing_delete(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 7:
@@ -151,6 +166,8 @@ def brand_brewing_delete(id: int, db: Session = Depends(get_db), current_user: v
 # Brand Finishing
 @router.post("/finishing", status_code=status.HTTP_201_CREATED, response_model=val_brands.FinishingBrandGet, tags=['Brands Finishing'], description=md_brands.finishing_create)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def brand_finishing_create(brand: val_brands.FinishingBrandCreate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 5:
@@ -177,6 +194,8 @@ def brand_finishing_create(brand: val_brands.FinishingBrandCreate, db: Session =
 
 @router.get("/finishing", response_model=List[val_brands.FinishingBrandGet], tags=['Brands Finishing'], description=md_brands.finishing_get_all)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def brand_finishing_get_all(db: Session = Depends(get_db), active: bool = True, current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
@@ -200,6 +219,8 @@ def brand_finishing_get_all(db: Session = Depends(get_db), active: bool = True, 
 
 @router.get("/finishing/{id}", response_model=val_brands.FinishingBrandGet, tags=['Brands Finishing'], description=md_brands.finishing_get_one)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def brand_finishing_get_one(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
@@ -224,6 +245,8 @@ def brand_finishing_get_one(id: int, db: Session = Depends(get_db), current_user
 
 @router.put("/finishing/{id}", response_model=val_brands.FinishingBrandGet, tags=['Brands Finishing'], description=md_brands.finishing_update)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def brand_finishing_update(brand: val_brands.FinishingBrandUpdate, id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 4:
@@ -256,6 +279,8 @@ def brand_finishing_update(brand: val_brands.FinishingBrandUpdate, id: int, db: 
 
 @router.delete("/finishing/{id}", status_code=status.HTTP_204_NO_CONTENT, tags=['Brands Finishing'], description=md_brands.finishing_delete)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def brand_finishing_delete(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 7:
@@ -284,7 +309,9 @@ def brand_finishing_delete(id: int, db: Session = Depends(get_db), current_user:
 
 # Brand Packaging
 @router.post("/packaging", status_code=status.HTTP_201_CREATED, response_model=val_brands.PackagingBrandGet, tags=['Brands Packaging'], description=md_brands.packaging_create)
-# @logger.catch()
+@logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def brand_packaging_create(brand: val_brands.PackagingBrandCreate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 5:
@@ -311,6 +338,8 @@ def brand_packaging_create(brand: val_brands.PackagingBrandCreate, db: Session =
 
 @router.get("/packaging", response_model=List[val_brands.PackagingBrandGet], tags=['Brands Packaging'], description=md_brands.packaging_get_all)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def brand_packaging_get_all(db: Session = Depends(get_db), active: bool = True, current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
@@ -335,6 +364,8 @@ def brand_packaging_get_all(db: Session = Depends(get_db), active: bool = True, 
 
 @router.get("/packaging/{id}", response_model=val_brands.PackagingBrandGet, tags=['Brands Packaging'], description=md_brands.packaging_get_one)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def brand_packaging_get_one(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
@@ -359,6 +390,8 @@ def brand_packaging_get_one(id: int, db: Session = Depends(get_db), current_user
 
 @router.put("/packaging/{id}", response_model=val_brands.PackagingBrandGet, tags=['Brands Packaging'], description=md_brands.packaging_update)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def brand_packaging_update(brand: val_brands.PackagingBrandUpdate, id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 4:
@@ -391,6 +424,8 @@ def brand_packaging_update(brand: val_brands.PackagingBrandUpdate, id: int, db: 
 
 @router.delete("/packaging/{id}", status_code=status.HTTP_204_NO_CONTENT, tags=['Brands Packaging'], description=md_brands.packaging_delete)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def brand_packaging_delete(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 7:

@@ -1,4 +1,5 @@
 from fastapi import status, Depends, APIRouter, Response
+from ratelimit import limits, sleep_and_retry
 from ..validators import val_users, val_auth
 from ..oauth2.oauth2 import get_current_user
 from sqlalchemy.exc import SQLAlchemyError
@@ -13,11 +14,17 @@ from typing import List
 import re
 
 
+LIMIT_SECONDS = 10
+LIMIT_CALLS = 20
+
+
 router = APIRouter(prefix="/users", tags=['Users'])
 
 
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=val_users.UsersGet, description=md_users.user_create)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def users_create(user: val_users.UsersCreate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 5:
@@ -51,6 +58,8 @@ def users_create(user: val_users.UsersCreate, db: Session = Depends(get_db), cur
 
 @router.get("", response_model=List[val_users.UsersGet], description=md_users.user_get_all)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def users_get_all(db: Session = Depends(get_db), active: bool = True, current_user: val_auth.UserCurrent = Depends(get_current_user)):
     
     if current_user.permissions < 1:
@@ -75,6 +84,8 @@ def users_get_all(db: Session = Depends(get_db), active: bool = True, current_us
 
 @router.get("/{id}", response_model=val_users.UsersGet, description=md_users.user_get_one)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def users_get_one(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
@@ -101,6 +112,8 @@ def users_get_one(id: int, db: Session = Depends(get_db), current_user: val_auth
 
 @router.put("/{id}", response_model=val_users.UsersGet, description=md_users.user_update)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def users_update(post: val_users.UsersUpdate, id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 5:
@@ -136,6 +149,8 @@ def users_update(post: val_users.UsersUpdate, id: int, db: Session = Depends(get
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT, description=md_users.user_delete)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def users_delete(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 7:

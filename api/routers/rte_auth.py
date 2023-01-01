@@ -1,5 +1,6 @@
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from fastapi import APIRouter, Depends, status, Response
+from ratelimit import limits, sleep_and_retry
 from fastapi.responses import JSONResponse
 from .. database.database import get_db
 from sqlalchemy.orm import Session
@@ -11,11 +12,17 @@ from .. utils import utils
 from loguru import logger
 
 
+LIMIT_SECONDS = 20
+LIMIT_CALLS = 5
+
+
 router = APIRouter(prefix="/login", tags=['Auth'])
 
 
 @router.post('', response_model=val_auth.Token, description=md_users.user_login)
 @logger.catch()
+@sleep_and_retry
+@limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def login(user_credentials: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
 
     try:
