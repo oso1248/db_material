@@ -166,6 +166,25 @@ def upgrade() -> None:
     AFTER INSERT ON inventory_uuid
     EXECUTE PROCEDURE delete_old_rows_inventory_uuid();
     """)
+    session.execute("""
+    CREATE OR REPLACE FUNCTION update_is_complete_inventory_hibernate() RETURNS TRIGGER
+    LANGUAGE plpgsql
+    AS
+    $$
+    BEGIN
+    IF NEW.tank_final IS NOT NULL AND NEW.tank_final_level IS NOT NULL THEN NEW.is_complete = TRUE;
+    END IF;
+    RETURN NEW;
+    END;
+    $$;
+    """)
+    session.execute("""
+    CREATE TRIGGER update_is_complete_inventory_hibernate
+    BEFORE UPDATE
+    ON inventory_hibernate
+    FOR EACH ROW
+    EXECUTE PROCEDURE update_is_complete_inventory_hibernate();
+    """)
     # ### end Alembic commands ###
 
 
@@ -180,4 +199,5 @@ def downgrade() -> None:
     bind = op.get_bind()
     session = Session(bind=bind)
     session.execute("DROP FUNCTION delete_old_rows_inventory_uuid();")
+    session.execute("DROP FUNCTION update_is_complete_inventory_hibernate();")
     # ### end Alembic commands ###
