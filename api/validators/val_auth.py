@@ -1,4 +1,6 @@
-from pydantic import BaseModel, conint
+from ..validators.val_users import Password, Name
+from pydantic import BaseModel, conint, EmailStr
+from typing import  Optional
 
 
 class UserLogin(BaseModel):
@@ -21,3 +23,20 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     id: int
     
+
+class ResetPassword(BaseModel):
+    temporary_password: str
+    email: bool
+
+    class Config:
+        orm_mode = True
+
+
+class ResetEmail(BaseModel):
+    email: Optional[EmailStr]
+
+
+class ChangePassword(BaseModel):
+    username: Name
+    oldpassword: Password
+    newpassword: Password

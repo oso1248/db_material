@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int
     USER_INSERT: str
     GIT_TOKEN: str
+    YAGMAIL_USERNAME: str
+    YAGMAIL_PASSWORD: str
 
     class Config:
         env_file = '.env'
