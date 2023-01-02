@@ -1,20 +1,3 @@
-user_login = """
-## ✅ Login Via From Data
-## ✅ JWT Bearer Token Required For All API Requests
-## ✅ Returns Invalid Credentials For All Incorrect Login Attempts
-* **
-#### Ingest Schema: OAuth2PasswordRequestForm
-#### Return Schema: JWT
-**The below table defines the HTTP Status codes that this API may return**
-
-| Status Code      | Description      | Reason                                          |
-| ---------------- | -----------------| ------------------------------------------------|
-| 200              | Posts Retrieved  | Successful                                      |
-| 403              | Forbidden        | Invalid Credentials                             |
-| 422              | Validation Error | Invalid/Missing Parameters Description          |
-"""
-
-
 # User Metadata
 user_create = """
 ## ✅ Permissions Required: 5

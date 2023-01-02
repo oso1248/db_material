@@ -9,4 +9,5 @@ regex_users_eid = re.compile(r'^[a-zA-Z0-9]{5,8}$')
 
 
 # Limits to 8 characters minimun, Uppercase, Lowercase, Number, Special Character [#?!@$%^&*-]
-regex_users_password = re.compile(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$')
+regex_users_password = re.compile(r"""^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!"#$%&'()*+,-\/.:;<=>?@[\]^_`{|}~\\]).{8,}$""")
+# regex_users_password = re.compile(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$')
