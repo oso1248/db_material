@@ -27,7 +27,7 @@ router = APIRouter(prefix="/suppliers", tags=['Suppliers'])
 def supplier_create(supplier: val_suppliers.SupplierCreate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 5:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         data = mdl_suppliers.Suppliers(created_by=current_user.id, updated_by=current_user.id, **supplier.dict())
@@ -55,7 +55,7 @@ def supplier_create(supplier: val_suppliers.SupplierCreate, db: Session = Depend
 def supplier_get_all(db: Session = Depends(get_db), active: bool = True, current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
     try:
         data = db.query(mdl_suppliers.Suppliers).filter(mdl_suppliers.Suppliers.is_active == active).all()
 
@@ -80,7 +80,7 @@ def supplier_get_all(db: Session = Depends(get_db), active: bool = True, current
 def supplier_get_one(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         data = db.query(mdl_suppliers.Suppliers).filter(mdl_suppliers.Suppliers.id == id).first()
@@ -106,7 +106,7 @@ def supplier_get_one(id: int, db: Session = Depends(get_db), current_user: val_a
 def supplier_update(supplier: val_suppliers.SupplierUpdate, id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 4:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         query = db.query(mdl_suppliers.Suppliers).filter(mdl_suppliers.Suppliers.id == id)
@@ -139,7 +139,7 @@ def supplier_update(supplier: val_suppliers.SupplierUpdate, id: int, db: Session
 def supplier_delete(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 7:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         data = db.query(mdl_suppliers.Suppliers).filter(mdl_suppliers.Suppliers.id == id)
