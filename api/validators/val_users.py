@@ -48,6 +48,6 @@ class UsersGet(UsersBase):
         orm_mode = True
 
 
-class UsersUpdate(BaseModel):
+class UsersUpdate(UsersBase):
     is_active: bool
     permissions: conint(ge=0, le=6)
