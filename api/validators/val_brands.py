@@ -8,6 +8,7 @@ from datetime import date
 
 # Include Brands
 class BrewingBrandInclude(BaseModel):
+    id: int
     name_brand: BrandName
     is_active: bool
     is_organic: bool
@@ -18,6 +19,7 @@ class BrewingBrandInclude(BaseModel):
 
 
 class FinishingBrandInclude(BaseModel):
+    id: int
     name_brand: BrandName
     note: Optional[Note]
 
