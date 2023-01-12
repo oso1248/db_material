@@ -27,7 +27,7 @@ router = APIRouter(prefix="/commodity", tags=['Commodity'])
 def commodity_create(commodity: val_commodity.CommodityCreate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 4:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         data = mdl_commodity.Commodity(created_by=current_user.id, updated_by=current_user.id, **commodity.dict())
@@ -55,7 +55,7 @@ def commodity_create(commodity: val_commodity.CommodityCreate, db: Session = Dep
 def commodity_get_all(db: Session = Depends(get_db), active: bool = True, type: str = Query("", enum=['Hop', 'Addition', 'Injection', 'Chemical']), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
     try:
         data = db.query(mdl_commodity.Commodity).order_by(mdl_commodity.Commodity.name_local).filter(mdl_commodity.Commodity.is_active == active, mdl_commodity.Commodity.type.ilike(f"%{type}%")).all()
 
@@ -80,7 +80,7 @@ def commodity_get_all(db: Session = Depends(get_db), active: bool = True, type: 
 def commodity_get_one(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         data = db.query(mdl_commodity.Commodity).filter(mdl_commodity.Commodity.id == id).first()
@@ -106,7 +106,7 @@ def commodity_get_one(id: int, db: Session = Depends(get_db), current_user: val_
 def commodity_update(supplier: val_commodity.CommodityUpdate, id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 4:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         query = db.query(mdl_commodity.Commodity).filter(mdl_commodity.Commodity.id == id)
@@ -139,7 +139,7 @@ def commodity_update(supplier: val_commodity.CommodityUpdate, id: int, db: Sessi
 def commodity_delete(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 7:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         data = db.query(mdl_commodity.Commodity).filter(mdl_commodity.Commodity.id == id)
