@@ -41,7 +41,7 @@ change = """
 
 | Status Code      | Description        | Reason                                          |
 | ---------------- | -------------------| ------------------------------------------------|
-| 200              | Posts Retrieved    | Successful                                      |
+| 205              | Password Changed   | Successful                                      |
 | 403              | Forbidden          | Invalid Credentials                             |
 | 417              | Expectation Failed | Invalid New Password                            |
 | 422              | Validation Error   | Invalid/Missing Parameters Description          |

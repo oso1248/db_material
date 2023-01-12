@@ -107,8 +107,10 @@ def change_password(user_credentials: OAuth2PasswordRequestForm = Depends(), db:
         if not utils.verify(user_credentials.password, user.password):
             return JSONResponse(status_code=status.HTTP_403_FORBIDDEN, content={'detail': 'invalid credentials'})
 
-        is_valid_password = regex_users_password.fullmatch(user_credentials.client_secret)
+        if not user_credentials.client_secret:
+            return JSONResponse(status_code=status.HTTP_417_EXPECTATION_FAILED, content={'detail': 'invalid new password'})
 
+        is_valid_password = regex_users_password.fullmatch(user_credentials.client_secret)
         if not is_valid_password:
             return JSONResponse(status_code=status.HTTP_417_EXPECTATION_FAILED, content={'detail': 'invalid new password'})
 
