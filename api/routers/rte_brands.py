@@ -28,7 +28,7 @@ router = APIRouter(prefix="/brand")
 def brand_brewing_create(brand: val_brands.BrewingBrandCreate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 5:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         data = mdl_brands.BrandBrewing(created_by=current_user.id, updated_by=current_user.id, **brand.dict())
@@ -56,7 +56,7 @@ def brand_brewing_create(brand: val_brands.BrewingBrandCreate, db: Session = Dep
 def brand_brewing_get_all(db: Session = Depends(get_db), active: bool = True, current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
     try:
         data = db.query(mdl_brands.BrandBrewing).order_by(mdl_brands.BrandBrewing.name_brand.asc()).filter(mdl_brands.BrandBrewing.is_active == active).all()
 
@@ -81,7 +81,7 @@ def brand_brewing_get_all(db: Session = Depends(get_db), active: bool = True, cu
 def brand_brewing_get_one(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         data = db.query(mdl_brands.BrandBrewing).filter(mdl_brands.BrandBrewing.id == id).first()
@@ -107,7 +107,7 @@ def brand_brewing_get_one(id: int, db: Session = Depends(get_db), current_user: 
 def brand_brewing_update(brand: val_brands.BrewingBrandUpdate, id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 4:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         query = db.query(mdl_brands.BrandBrewing).filter(mdl_brands.BrandBrewing.id == id)
@@ -140,7 +140,7 @@ def brand_brewing_update(brand: val_brands.BrewingBrandUpdate, id: int, db: Sess
 def brand_brewing_delete(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 7:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         data = db.query(mdl_brands.BrandBrewing).filter(mdl_brands.BrandBrewing.id == id)
@@ -171,7 +171,7 @@ def brand_brewing_delete(id: int, db: Session = Depends(get_db), current_user: v
 def brand_finishing_create(brand: val_brands.FinishingBrandCreate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 5:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         data = mdl_brands.BrandFinishing(created_by=current_user.id, updated_by=current_user.id, **brand.dict())
@@ -199,7 +199,8 @@ def brand_finishing_create(brand: val_brands.FinishingBrandCreate, db: Session =
 def brand_finishing_get_all(db: Session = Depends(get_db), active: bool = True, current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
+
     try:
         data = db.query(mdl_brands.BrandFinishing).join(mdl_brands.BrandBrewing, mdl_brands.BrandFinishing.id_brand_brewing == mdl_brands.BrandBrewing.id, isouter=False).filter(mdl_brands.BrandBrewing.is_active == active).order_by(mdl_brands.BrandFinishing.name_brand.asc()).all()
 
@@ -224,7 +225,7 @@ def brand_finishing_get_all(db: Session = Depends(get_db), active: bool = True, 
 def brand_finishing_get_one(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         data = db.query(mdl_brands.BrandFinishing).filter(mdl_brands.BrandFinishing.id == id).first()
@@ -248,9 +249,9 @@ def brand_finishing_get_one(id: int, db: Session = Depends(get_db), current_user
 @sleep_and_retry
 @limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def brand_finishing_update(brand: val_brands.FinishingBrandUpdate, id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
-
+    
     if current_user.permissions < 4:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         query = db.query(mdl_brands.BrandFinishing).filter(mdl_brands.BrandFinishing.id == id)
@@ -284,7 +285,7 @@ def brand_finishing_update(brand: val_brands.FinishingBrandUpdate, id: int, db: 
 def brand_finishing_delete(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 7:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         data = db.query(mdl_brands.BrandFinishing).filter(mdl_brands.BrandFinishing.id == id)
@@ -315,7 +316,7 @@ def brand_finishing_delete(id: int, db: Session = Depends(get_db), current_user:
 def brand_packaging_create(brand: val_brands.PackagingBrandCreate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 5:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         data = mdl_brands.BrandPackaging(created_by=current_user.id, updated_by=current_user.id, **brand.dict())
@@ -343,7 +344,8 @@ def brand_packaging_create(brand: val_brands.PackagingBrandCreate, db: Session =
 def brand_packaging_get_all(db: Session = Depends(get_db), active: bool = True, current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
+
     try:
         data = db.query(mdl_brands.BrandPackaging).join(mdl_brands.BrandFinishing, mdl_brands.BrandPackaging.id_brand_finishing == mdl_brands.BrandFinishing.id, isouter=False).join(mdl_brands.BrandBrewing, mdl_brands.BrandFinishing.id_brand_brewing == mdl_brands.BrandBrewing.id, isouter=False).filter(mdl_brands.BrandBrewing.is_active == active).order_by(mdl_brands.BrandPackaging.name_brand.asc()).all()
 
@@ -369,7 +371,7 @@ def brand_packaging_get_all(db: Session = Depends(get_db), active: bool = True, 
 def brand_packaging_get_one(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         data = db.query(mdl_brands.BrandPackaging).filter(mdl_brands.BrandPackaging.id == id).first()
@@ -395,7 +397,7 @@ def brand_packaging_get_one(id: int, db: Session = Depends(get_db), current_user
 def brand_packaging_update(brand: val_brands.PackagingBrandUpdate, id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 4:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         query = db.query(mdl_brands.BrandPackaging)\
@@ -429,7 +431,7 @@ def brand_packaging_update(brand: val_brands.PackagingBrandUpdate, id: int, db: 
 def brand_packaging_delete(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 7:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         data = db.query(mdl_brands.BrandPackaging).filter(mdl_brands.BrandPackaging.id == id)
