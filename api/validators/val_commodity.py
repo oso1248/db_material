@@ -12,7 +12,7 @@ class CommodityInclude(BaseModel):
     name_local: CommodityName
     name_bit: constr(min_length=5, max_length=50)
     name_common: CommodityName
-    per_unit: conint(ge=0, le=1000)
+    per_unit: conint(ge=0, le=10000)
     unit_of_measurement: str
 
     class Config:
@@ -28,7 +28,7 @@ class CommodityBase(BaseModel):
     type: Type
     sap: Sap
     unit_of_measurement: str
-    per_unit: conint(ge=0, le=1000)
+    per_unit: conint(ge=0, le=10000)
     per_pallet: conint(ge=0, le=1000)
     note: Optional[Note]
     is_active: bool
