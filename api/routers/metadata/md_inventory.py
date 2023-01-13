@@ -131,7 +131,7 @@ inv_material_update = """
 
 
 inv_material_delete_all = """
-## ✅ Permissions Required: 5
+## ✅ Permissions Required: 4
 ## ✅ Deleting Entries Is Generally Discouraged.
 ## ✅ THIS DELETES THE ENTIRE INVENTORY AND CANNOT BE UNDONE.
 ## ✅ All Entries Self DELETE After 3 Years.\
@@ -152,7 +152,7 @@ inv_material_delete_all = """
 
 
 inv_material_delete = """
-## ✅ Permissions Required: 5
+## ✅ Permissions Required: 3
 ## ✅ Deleting Entries Is Generally Discouraged.
 ## ✅ All Entries Self DELETE After 3 Years.
 * **

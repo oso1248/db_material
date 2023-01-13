@@ -32,7 +32,7 @@ router = APIRouter(prefix="/inventory")
 def inventory_dates_get_all(limit: int = 10, skip: int = 0, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         data = db.query(mdl_inventory.InventoryUUID).order_by(mdl_inventory.InventoryUUID.inventory_date.desc()).limit(limit).offset(skip).all()
@@ -60,7 +60,7 @@ def inventory_dates_get_all(limit: int = 10, skip: int = 0, db: Session = Depend
 def inventory_bit_get(uuid: val_inventory.InvRetrieve, inventory: str = Query('%___', enum=['Brw', 'Fin', 'Log']), db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         data = db.execute("""
@@ -103,7 +103,7 @@ def inventory_bit_get(uuid: val_inventory.InvRetrieve, inventory: str = Query('%
 def inventory_material_create(commodity: List[val_inventory.InvMaterialCreate], db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 3:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         current_uuid = get_uuid(current_user.id, db)
@@ -140,7 +140,7 @@ def inventory_material_create(commodity: List[val_inventory.InvMaterialCreate], 
 def inventory_material_add(uuid: UUID4, commodity: val_inventory.InvMaterialCreate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 3:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         data = mdl_inventory.InventoryMaterial(created_by=current_user.id, updated_by=current_user.id, uuid=uuid, **commodity.dict())
@@ -161,17 +161,17 @@ def inventory_material_add(uuid: UUID4, commodity: val_inventory.InvMaterialCrea
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.get("/material", response_model=List[val_inventory.InvMaterialGet], description=md_inventory.inv_material_get_all, tags=['Inventory Material'])
+@router.get("/material/all/{uuid}", response_model=List[val_inventory.InvMaterialGet], description=md_inventory.inv_material_get_all, tags=['Inventory Material'])
 @logger.catch()
 @sleep_and_retry
 @limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
-def inventory_material_get_all(uuid: val_inventory.InvRetrieve, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
+def inventory_material_get_all(uuid: UUID4, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
-        data = db.query(mdl_inventory.InventoryMaterial).filter(mdl_inventory.InventoryMaterial.uuid == uuid.uuid).all()
+        data = db.query(mdl_inventory.InventoryMaterial).filter(mdl_inventory.InventoryMaterial.uuid == uuid).all()
 
         if not data:
             return Response(status_code=status.HTTP_404_NOT_FOUND)
@@ -188,14 +188,14 @@ def inventory_material_get_all(uuid: val_inventory.InvRetrieve, db: Session = De
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.get("/material/{id}", response_model=val_inventory.InvMaterialGet, description=md_inventory.inv_material_get_one, tags=['Inventory Material'])
+@router.get("/material/one/{id}", response_model=val_inventory.InvMaterialGet, description=md_inventory.inv_material_get_one, tags=['Inventory Material'])
 @logger.catch()
 @sleep_and_retry
 @limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def inventory_material_get_one(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         data = db.query(mdl_inventory.InventoryMaterial).filter(mdl_inventory.InventoryMaterial.id == id).first()
@@ -215,14 +215,14 @@ def inventory_material_get_one(id: int, db: Session = Depends(get_db), current_u
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.put("/material/{id}", response_model=val_inventory.InvMaterialGet, description=md_inventory.inv_material_update, tags=['Inventory Material'])
+@router.put("/material/one/{id}", response_model=val_inventory.InvMaterialGet, description=md_inventory.inv_material_update, tags=['Inventory Material'])
 @logger.catch()
 @sleep_and_retry
 @limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def inventory_material_update(id: int, commodity: val_inventory.InvMaterialUpdate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 3:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         query = db.query(mdl_inventory.InventoryMaterial).filter(mdl_inventory.InventoryMaterial.id == id)
@@ -248,17 +248,17 @@ def inventory_material_update(id: int, commodity: val_inventory.InvMaterialUpdat
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.delete("/material/delete", status_code=status.HTTP_204_NO_CONTENT, description=md_inventory.inv_material_delete_all, tags=['Inventory Material'])
+@router.delete("/material/all/{uuid}", status_code=status.HTTP_204_NO_CONTENT, description=md_inventory.inv_material_delete_all, tags=['Inventory Material'])
 @logger.catch()
 @sleep_and_retry
 @limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
-def inventory_material_delete_all(uuid: val_inventory.InvRetrieve, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
+def inventory_material_delete_all(uuid: UUID4, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 4:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
-        data = db.query(mdl_inventory.InventoryMaterial).filter(mdl_inventory.InventoryMaterial.uuid == uuid.uuid)
+        data = db.query(mdl_inventory.InventoryMaterial).filter(mdl_inventory.InventoryMaterial.uuid == uuid)
         does_exist = data.first()
 
         if not does_exist:
@@ -278,14 +278,14 @@ def inventory_material_delete_all(uuid: val_inventory.InvRetrieve, db: Session =
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.delete("/material/delete/{id}", status_code=status.HTTP_204_NO_CONTENT, description=md_inventory.inv_material_delete, tags=['Inventory Material'])
+@router.delete("/material/one/{id}", status_code=status.HTTP_204_NO_CONTENT, description=md_inventory.inv_material_delete, tags=['Inventory Material'])
 @logger.catch()
 @sleep_and_retry
 @limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
 def inventory_material_delete(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
-    if current_user.permissions < 5:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+    if current_user.permissions < 3:
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         data = db.query(mdl_inventory.InventoryMaterial).filter(mdl_inventory.InventoryMaterial.id == id)
@@ -316,7 +316,7 @@ def inventory_material_delete(id: int, db: Session = Depends(get_db), current_us
 def inventory_hop_create(commodity: List[val_inventory.InvHopCreate], db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 2:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         current_uuid: UUID4 = get_uuid(current_user.id, db)
@@ -356,7 +356,7 @@ def inventory_hop_create(commodity: List[val_inventory.InvHopCreate], db: Sessio
 def inventory_hop_add(uuid: UUID4, commodity: val_inventory.InvHopCreate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 2:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         is_last_brews = check_last_brews(uuid, db)
@@ -389,7 +389,7 @@ def inventory_hop_add(uuid: UUID4, commodity: val_inventory.InvHopCreate, db: Se
 def inventory_hop_get_all(uuid: val_inventory.InvRetrieve, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         data = db.query(mdl_inventory.InventoryHop).join(mdl_commodity.Commodity, mdl_inventory.InventoryHop.id_commodity == mdl_commodity.Commodity.id).order_by(mdl_commodity.Commodity.name_local.asc()).filter(mdl_inventory.InventoryHop.uuid == uuid.uuid).all()
@@ -416,7 +416,7 @@ def inventory_hop_get_all(uuid: val_inventory.InvRetrieve, db: Session = Depends
 def inventory_hop_get_one(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         data = db.query(mdl_inventory.InventoryHop).filter(mdl_inventory.InventoryHop.id == id).first()
@@ -443,7 +443,7 @@ def inventory_hop_get_one(id: int, db: Session = Depends(get_db), current_user: 
 def inventory_hop_update(id: int, commodity: val_inventory.InvHopUpdate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 3:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         query = db.query(mdl_inventory.InventoryHop).filter(mdl_inventory.InventoryHop.id == id)
@@ -476,7 +476,7 @@ def inventory_hop_update(id: int, commodity: val_inventory.InvHopUpdate, db: Ses
 def inventory_hop_delete_all(uuid: val_inventory.InvRetrieve, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 4:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         data = db.query(mdl_inventory.InventoryLastBrews).filter(mdl_inventory.InventoryLastBrews.uuid == uuid.uuid)
@@ -506,7 +506,7 @@ def inventory_hop_delete_all(uuid: val_inventory.InvRetrieve, db: Session = Depe
 def inventory_hop_delete(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 2:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         data = db.query(mdl_inventory.InventoryHop).filter(mdl_inventory.InventoryHop.id == id)
@@ -537,7 +537,7 @@ def inventory_hop_delete(id: int, db: Session = Depends(get_db), current_user: v
 def inventory_last_brews_create(brews: val_inventory.InvLastBrewsCreate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 2:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         current_uuid = get_uuid(current_user.id, db)
@@ -572,7 +572,7 @@ def inventory_last_brews_create(brews: val_inventory.InvLastBrewsCreate, db: Ses
 def inventory_last_brews_get_all(limit: int = 10, skip: int = 0, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         data = db.query(mdl_inventory.InventoryLastBrews).join(mdl_inventory.InventoryUUID, mdl_inventory.InventoryLastBrews.uuid == mdl_inventory.InventoryUUID.uuid).order_by(mdl_inventory.InventoryUUID.inventory_date.desc()).limit(limit).offset(skip).all()
@@ -599,7 +599,7 @@ def inventory_last_brews_get_all(limit: int = 10, skip: int = 0, db: Session = D
 def inventory_last_brews_get_one(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         data = db.query(mdl_inventory.InventoryLastBrews).filter(mdl_inventory.InventoryLastBrews.id == id).first()
@@ -626,7 +626,7 @@ def inventory_last_brews_get_one(id: int, db: Session = Depends(get_db), current
 def inventory_last_brews_update(id: int, brews: val_inventory.InvLastBrewsUpdate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 2:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         query = db.query(mdl_inventory.InventoryLastBrews).filter(mdl_inventory.InventoryLastBrews.id == id)
@@ -659,7 +659,7 @@ def inventory_last_brews_update(id: int, brews: val_inventory.InvLastBrewsUpdate
 def inventory_last_brews_delete(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 4:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         data = db.query(mdl_inventory.InventoryLastBrews).filter(mdl_inventory.InventoryLastBrews.id == id)
@@ -690,7 +690,7 @@ def inventory_last_brews_delete(id: int, db: Session = Depends(get_db), current_
 def inventory_hibernate_create(hibernate: val_inventory.InvHibernateCreate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 2:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         current_uuid = get_uuid(current_user.id, db)
@@ -721,7 +721,7 @@ def inventory_hibernate_create(hibernate: val_inventory.InvHibernateCreate, db: 
 def inventory_hibernate_get_all(limit: int = 30, skip: int = 0, complete: bool = Query(False, enum=[True, False]), db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         data = db.query(mdl_inventory.InventoryHibernate).order_by(mdl_inventory.InventoryHibernate.time_created.desc()).filter(mdl_inventory.InventoryHibernate.is_complete == complete).limit(limit).offset(skip).all()
@@ -748,7 +748,7 @@ def inventory_hibernate_get_all(limit: int = 30, skip: int = 0, complete: bool =
 def inventory_hibernate_get_one(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         data = db.query(mdl_inventory.InventoryHibernate).filter(mdl_inventory.InventoryHibernate.id == id).first()
@@ -775,7 +775,7 @@ def inventory_hibernate_get_one(id: int, db: Session = Depends(get_db), current_
 def inventory_hibernate_update(id: int, hibernated: val_inventory.InvHibernateUpdate, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 2:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         query = db.query(mdl_inventory.InventoryHibernate).filter(mdl_inventory.InventoryHibernate.id == id)
@@ -810,7 +810,7 @@ def inventory_hibernate_update(id: int, hibernated: val_inventory.InvHibernateUp
 def inventory_hibernate_delete(id: int, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 4:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': "Unauthorized"})
+        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
         data = db.query(mdl_inventory.InventoryHibernate).filter(mdl_inventory.InventoryHibernate.id == id)
