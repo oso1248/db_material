@@ -9,7 +9,7 @@ class InventoryUUID(Base):
     __tablename__ = "inventory_uuid"
 
     uuid = Column(UUID(as_uuid=True), primary_key=True, nullable=False, server_default=text('gen_random_uuid()'))
-    inventory_date = Column(Date, nullable=False)
+    inventory_date = Column(Date, unique=True, nullable=False)
     created_by = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     updated_by = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     time_created = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))

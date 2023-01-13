@@ -90,7 +90,7 @@ def test_update_commodity(client, request, create_users, create_suppliers, user_
     client.headers = {"Authorization": f"Bearer {user_lvl_admin['jwt']}"}
     res = client.post(f"/commodity", json={"id_supplier": 1, "name_local": "Test Local", "name_bit": "Test Bit", "name_common": "Test Common", "inventory": "Brw", "type": "Addition", "sap": "10000000", "unit_of_measurement": "kg", "per_unit": 100, "per_pallet": 100, "is_active": True, "updated_by": user_lvl_admin['id']})
     user_data = res.json()
-    print(user_data)
+
     user = request.getfixturevalue(user_level)
     client.headers = {"Authorization": f"Bearer {user['jwt']}"}
     res = client.put(f"/commodity/{user_data['id']}", json={"id_supplier": id_supplier, "name_local": name_local, "name_bit": name_bit, "name_common": name_common, "inventory": inventory, "type": type, "sap": sap, "unit_of_measurement": unit_of_measurement, "per_unit": per_unit, "per_pallet": per_pallet, "is_active": is_active, "updated_by": user['id']})
