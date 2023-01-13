@@ -61,6 +61,6 @@ def create_inventory_hop(session, create_inventory_dates, create_last_brews):
     session.execute(f"""INSERT INTO inventory_hop (uuid, id_commodity, final_boxes, final_pounds, final_total, lot_number, is_current, created_by, updated_by) VALUES {values_string}""")
     session.commit()
 
-    data_inventory = session.execute(f"""SELECT * FROM inventory_hop WHERE uuid = '{create_last_brews[0]}' ORDER BY id """).all()
+    data_inventory = session.execute(f"""SELECT * FROM inventory_hop WHERE uuid = '{create_last_brews[1]}' ORDER BY id """).all()
 
     return {"last_brews": create_last_brews, "inv": data_inventory}
