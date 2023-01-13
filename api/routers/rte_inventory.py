@@ -382,17 +382,17 @@ def inventory_hop_add(uuid: UUID4, commodity: val_inventory.InvHopCreate, db: Se
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.get("/hop", response_model=List[val_inventory.InvHopGet], description=md_inventory.inv_hop_get_all, tags=['Inventory Hop'])
+@router.get("/hop/all/{uuid}", response_model=List[val_inventory.InvHopGet], description=md_inventory.inv_hop_get_all, tags=['Inventory Hop'])
 @logger.catch()
 @sleep_and_retry
 @limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
-def inventory_hop_get_all(uuid: val_inventory.InvRetrieve, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
+def inventory_hop_get_all(uuid: UUID4, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
         return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
-        data = db.query(mdl_inventory.InventoryHop).join(mdl_commodity.Commodity, mdl_inventory.InventoryHop.id_commodity == mdl_commodity.Commodity.id).order_by(mdl_commodity.Commodity.name_local.asc()).filter(mdl_inventory.InventoryHop.uuid == uuid.uuid).all()
+        data = db.query(mdl_inventory.InventoryHop).join(mdl_commodity.Commodity, mdl_inventory.InventoryHop.id_commodity == mdl_commodity.Commodity.id).order_by(mdl_commodity.Commodity.name_local.asc()).filter(mdl_inventory.InventoryHop.uuid == uuid).all()
 
         if not data:
             return Response(status_code=status.HTTP_404_NOT_FOUND)
@@ -409,7 +409,7 @@ def inventory_hop_get_all(uuid: val_inventory.InvRetrieve, db: Session = Depends
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.get("/hop/{id}", response_model=val_inventory.InvHopGet, description=md_inventory.inv_hop_get_one, tags=['Inventory Hop'])
+@router.get("/hop/one/{id}", response_model=val_inventory.InvHopGet, description=md_inventory.inv_hop_get_one, tags=['Inventory Hop'])
 @logger.catch()
 @sleep_and_retry
 @limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
@@ -436,7 +436,7 @@ def inventory_hop_get_one(id: int, db: Session = Depends(get_db), current_user: 
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.put("/hop/{id}", response_model=val_inventory.InvHopGet, description=md_inventory.inv_hop_update, tags=['Inventory Hop'])
+@router.put("/hop/one/{id}", response_model=val_inventory.InvHopGet, description=md_inventory.inv_hop_update, tags=['Inventory Hop'])
 @logger.catch()
 @sleep_and_retry
 @limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
@@ -469,17 +469,17 @@ def inventory_hop_update(id: int, commodity: val_inventory.InvHopUpdate, db: Ses
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.delete("/hop/delete", status_code=status.HTTP_204_NO_CONTENT, description=md_inventory.inv_hop_delete_all, tags=['Inventory Hop'])
+@router.delete("/hop/all/{uuid}", status_code=status.HTTP_204_NO_CONTENT, description=md_inventory.inv_hop_delete_all, tags=['Inventory Hop'])
 @logger.catch()
 @sleep_and_retry
 @limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
-def inventory_hop_delete_all(uuid: val_inventory.InvRetrieve, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
+def inventory_hop_delete_all(uuid: UUID4, db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 4:
         return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     try:
-        data = db.query(mdl_inventory.InventoryLastBrews).filter(mdl_inventory.InventoryLastBrews.uuid == uuid.uuid)
+        data = db.query(mdl_inventory.InventoryLastBrews).filter(mdl_inventory.InventoryLastBrews.uuid == uuid)
         does_exist = data.first()
 
         if not does_exist:
@@ -499,7 +499,7 @@ def inventory_hop_delete_all(uuid: val_inventory.InvRetrieve, db: Session = Depe
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.delete("/hop/delete/{id}", status_code=status.HTTP_204_NO_CONTENT, description=md_inventory.inv_hop_delete, tags=['Inventory Hop'])
+@router.delete("/hop/one/{id}", status_code=status.HTTP_204_NO_CONTENT, description=md_inventory.inv_hop_delete, tags=['Inventory Hop'])
 @logger.catch()
 @sleep_and_retry
 @limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
