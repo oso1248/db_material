@@ -187,4 +187,4 @@ class InvHibernateUpdate(InvHibernateBase):
     tank_final: Optional[int]
     tank_final_level: Optional[conint(ge=0, le=5000)]
     note_final: Optional[Note]
-    is_complete: bool
+    is_complete: Optional[bool]

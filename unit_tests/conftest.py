@@ -5,11 +5,11 @@ from api.database.database import get_db
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from alembic.config import Config
+from api.models import mdl_users
 from api.config import settings
 from alembic import command
 from api.main import app
 import pytest
-from api.models import mdl_users
 
 
 TEST_SQLALCHEMY_DATABASE_URL = f"""postgresql://{settings.DATABASE_USERNAME}:{settings.DATABASE_PASSWORD}@{settings.DATABASE_HOST}:{settings.DATABASE_PORT}/{settings.DATABASE_NAME}_test"""
