@@ -53,11 +53,11 @@ def inventory_dates_get_all(limit: int = 10, skip: int = 0, db: Session = Depend
 
 
 # Inventory Bit
-@router.get("/bit", response_model=List[val_inventory.InvBitGet], description=md_inventory.inv_bit_get, tags=['Inventory Bit'])
+@router.get("/bit/{uuid}", response_model=List[val_inventory.InvBitGet], description=md_inventory.inv_bit_get, tags=['Inventory Bit'])
 @logger.catch()
 @sleep_and_retry
 @limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
-def inventory_bit_get(uuid: val_inventory.InvRetrieve, inventory: str = Query('%___', enum=['Brw', 'Fin', 'Log']), db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
+def inventory_bit_get(uuid: UUID4, inventory: str = Query('%___', enum=['Brw', 'Fin', 'Log']), db: Session = Depends(get_db), current_user: val_auth.UserCurrent = Depends(get_current_user)):
 
     if current_user.permissions < 1:
         return Response(status_code=status.HTTP_403_FORBIDDEN)
@@ -79,7 +79,7 @@ def inventory_bit_get(uuid: val_inventory.InvRetrieve, inventory: str = Query('%
         WHERE inventory ILIKE :inv
         GROUP BY inventory, name_bit, sap, unit_of_measurement, inv.inventory_date
         ORDER BY name_bit;
-        """, {'val': uuid.uuid, 'inv': inventory}).fetchall()
+        """, {'val': uuid, 'inv': inventory}).fetchall()
 
         if len(data) == 0:
             return Response(status_code=status.HTTP_404_NOT_FOUND)
@@ -803,7 +803,7 @@ def inventory_hibernate_update(id: int, hibernated: val_inventory.InvHibernateUp
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.delete("/hibernate/delete/{id}", status_code=status.HTTP_204_NO_CONTENT, description=md_inventory.inv_hibernate_delete, tags=['Inventory Hibernate'])
+@router.delete("/hibernate/{id}", status_code=status.HTTP_204_NO_CONTENT, description=md_inventory.inv_hibernate_delete, tags=['Inventory Hibernate'])
 @logger.catch()
 @sleep_and_retry
 @limits(calls=LIMIT_CALLS, period=LIMIT_SECONDS)
